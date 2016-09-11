@@ -17,18 +17,22 @@ class SearchEngine extends Controller
 
 
         $documentos=Documento::all();
-//        return $documentos;
+        //return $documentos;
         //cada posición representa un termino registrado en el diccionario
         $dictionary = array();
         $docCount = array();
 
         //se recorren todos los docuemntos
         foreach($documentos as $docID => $doc) {
+            
+            //arreglo donde cada posición representa un termino 
             $terms = explode(' ', $doc);
-            //arreglo donde cada posición representa la cantidad de terminos de un doc específico
+            // return $terms;
+           
+           //cada posicion representa la cantidad de terminos que tiene cada doc
             $docCount[$docID] = count($terms);
-
-            //se recorren los terminos que posee un documento
+    
+            //se recorren los terminos que posee uno de los documentos
             foreach($terms as $term) {
 
                 //si no cuenta con el termino en el diccionario se crea estructura
@@ -39,15 +43,14 @@ class SearchEngine extends Controller
                 //si no hay nada definido en la la posicion docid de posting
                 if(!isset($dictionary[$term]['postings'][$docID])) {
 
-                    //frecuencia del documento
+                    //cantidad de veces que se repite un termino en todos los documentos
                     $dictionary[$term]['df']++;
 
-                    //se almacena la frecuencia de terminos que aparecen en un documento determinao
+                    //se crea la estructura para poder sumar la cantidad de terminos iguales en un doc
                     $dictionary[$term]['postings'][$docID] = array('tf' => 0);
                 }
 
-                //si cuenta con el termino en el diccionario va
-                //
+                    //cantidad de veces que aparece un termnino en un documento
                     $dictionary[$term]['postings'][$docID]['tf']++;
             }
         }

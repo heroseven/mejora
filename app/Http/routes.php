@@ -23,7 +23,7 @@
 */
 
 
-
+use App\Models\Documento;
 
 Route::group(['middleware' => ['web']], function () {
 
