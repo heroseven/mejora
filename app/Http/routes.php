@@ -22,6 +22,9 @@
 |
 */
 
+
+
+
 Route::group(['middleware' => ['web']], function () {
 
     Route::get('/', function () {
@@ -35,7 +38,15 @@ Route::group(['middleware' => ['web']], function () {
     Route::auth();
 
 });
+
+Route::get('search','SearchEngine@search');
 Route::get('/',function (){
+
+
+    $documento1=Documento::find(1);
+
+
+
     return 'hello';
 
 });
