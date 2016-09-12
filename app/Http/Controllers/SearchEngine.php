@@ -11,13 +11,13 @@ use App\Http\Controllers\Controller;
 class SearchEngine extends Controller
 {
 
-
-    public function search(){
+    public function indexar(){
 
 
 
         $documentos=Documento::all();
-        //return $documentos;
+        $documentos=$documentos->pluck('contenido');
+
         //cada posición representa un termino registrado en el diccionario
         $dictionary = array();
         $docCount = array();
@@ -58,7 +58,80 @@ class SearchEngine extends Controller
         // y el diccionario con la
         return array('docCount' => $docCount, 'dictionary' => $dictionary);
     }
+    
+    public function puntuar_segun_busqueda($busqueda){
+        
+        
+        $diccionario=$this->indexar();
+        
+        //puntuaciones del termino buscado
+        $puntuaciones=$diccionario['dictionary'][$busqueda];
+        //return $puntuaciones;
+        $ocurrencia_global=$puntuaciones['df'];
+ 
 
+        $numero_de_documentos=count($diccionario['docCount']);
 
+        //para guardar puntuación
+        
+        $formula=array();
+        
+        foreach ($puntuaciones['postings'] as $docID => $puntuacion_por_documento) {
+            
+            //docID +1 
+            //puntuacion local + puntuacion global.
+            $formula[$docID]= $puntuacion_por_documento['tf']*log($numero_de_documentos/$ocurrencia_global);
+            
+    
+        }
+        
+         arsort($formula); // high to low
+        
+        var_dump($formula);
+        
+        // // return $formula;
+        // return var_dump($formula);
+        //todo es perfecto pero no es tan preciso porque no considera la loingitud del texto
+        //la propouesta es condierar cada docuemnto no como un punto en el espacio sino como un vector
+        //calcular el punto del vector es facil, multiplicar cada posicion es el resultado.
+        //se puede comparar un documento con otro.
+        /*podemos hallar el peso del docuemnto en terminos de x(termino1) e y(termino2)
+        si son muchos terminos en una pagina hay que noramlizar dividiendo entre la cantidad de terminos
+        no sería eficiente comparar todos los docuemntos con la busqueda
+        
+        
+        */
+        
+        
+    }    
+    public function comparar($busqueda){
+   
+        $index = $this->indexar();
+        $matchDocs = array();
+        $docCount = count($index['docCount']);
 
+        $busqueda="hola como";
+        $query = explode(" ", $busqueda);
+        foreach($query as $qterm) {
+        $entry = $index['dictionary'][$qterm];
+            //para cada 
+            foreach($entry['postings'] as $docID => $posting) {
+                
+            //si añadimos 1 mas tanto a $docCount y df tendremos mejores valores con pocos elementos.
+            $matchDocs[$docID] = $posting['tf'] * log($docCount / $entry['df'], 2);
+            }
+        }
+        
+        
+        // length normalise
+        foreach($matchDocs as $docID => $score) {
+            $matchDocs[$docID] = $score/$index['docCount'][$docID];
+        }
+        
+        arsort($matchDocs); // high to low
+        
+        var_dump($matchDocs);
+  
+    
+    }
 }

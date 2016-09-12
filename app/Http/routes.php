@@ -39,7 +39,9 @@ Route::group(['middleware' => ['web']], function () {
 
 });
 
-Route::get('search','SearchEngine@search');
+Route::get('indexar','SearchEngine@indexar');
+Route::get('search/{busqueda}','SearchEngine@puntuar_segun_busqueda');
+Route::get('comparar/{busqueda}','SearchEngine@comparar');
 Route::get('/',function (){
 
 
