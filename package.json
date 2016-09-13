@@ -4,7 +4,10 @@
     "gulp": "^3.8.8"
   },
   "dependencies": {
+    "bootstrap-sass": "^3.0.0",
     "laravel-elixir": "^4.0.0",
-    "bootstrap-sass": "^3.0.0"
+    "onsenui": "^2.0.0-rc.18",
+    "vue": "^1.0.26",
+    "vue-onsenui": "^0.1.3"
   }
 }

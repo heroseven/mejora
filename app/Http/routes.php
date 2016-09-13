@@ -25,30 +25,27 @@
 
 use App\Models\Documento;
 
+
+
+Route::get('indexar','SearchEngine@indexar');
+Route::get('search/{busqueda}','SearchEngine@puntuar_segun_busqueda');
+Route::post('buscador','SearchEngine@puntuacion_mayor');
+Route::get('/',function (){
+
+    return View::make('buscador');
+
+});
+
 Route::group(['middleware' => ['web']], function () {
 
-    Route::get('/', function () {
-        return view('welcome');
-    })->middleware('guest');
+    // Route::get('/', function () {
+    //     return view('welcome');
+    // })->middleware('guest');
 
     Route::get('/tasks', 'TaskController@index');
     Route::post('/task', 'TaskController@store');
     Route::delete('/task/{task}', 'TaskController@destroy');
 
     Route::auth();
-
-});
-
-Route::get('indexar','SearchEngine@indexar');
-Route::get('search/{busqueda}','SearchEngine@puntuar_segun_busqueda');
-Route::get('comparar/{busqueda}','SearchEngine@comparar');
-Route::get('/',function (){
-
-
-    $documento1=Documento::find(1);
-
-
-
-    return 'hello';
 
 });

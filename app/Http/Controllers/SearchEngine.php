@@ -3,11 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Documento;
-use Illuminate\Http\Request;
-
-use App\Http\Requests;
 use App\Http\Controllers\Controller;
-
+use Illuminate\Http\Request;
 class SearchEngine extends Controller
 {
 
@@ -104,34 +101,57 @@ class SearchEngine extends Controller
         
         
     }    
-    public function comparar($busqueda){
+    public function puntuacion_mayor(Request $request){
    
         $index = $this->indexar();
-        $matchDocs = array();
+        $matchDocs=array();
+        //corregir error de Undefined offset: 3
         $docCount = count($index['docCount']);
-
-        $busqueda="hola como";
-        $query = explode(" ", $busqueda);
-        foreach($query as $qterm) {
-        $entry = $index['dictionary'][$qterm];
-            //para cada 
-            foreach($entry['postings'] as $docID => $posting) {
-                
-            //si añadimos 1 mas tanto a $docCount y df tendremos mejores valores con pocos elementos.
-            $matchDocs[$docID] = $posting['tf'] * log($docCount / $entry['df'], 2);
-            }
+        for($i=0;$i<$docCount;$i++){
+            $matchDocs[$i]=0;
         }
         
         
-        // length normalise
+        $busqueda="ejemplo un es hola las";
+        $busqueda=$request->input('terminos');
+        $query = explode(" ", $busqueda);
+        
+        foreach($query as $qterm) {
+          
+            if(isset($index['dictionary'][$qterm])){
+                    
+                    $entry = $index['dictionary'][$qterm];
+          
+                 
+                    foreach($entry['postings'] as $docID => $posting) {
+                        
+                    //si añadimos 1 mas tanto a $docCount y df tendremos mejores valores con pocos elementos.
+                   
+                    //este arreglo aumenta de tamaño miemtras más contenido tenga
+                    //si se encuentra una palabra x en dos articulos, el segundo chanca al primero.
+                    //no puede ser multiplicacion porque si fuera cero caga todo.
+                    $matchDocs[$docID] = $matchDocs[$docID]+$posting['tf'] * log($docCount / $entry['df'], 10);
+                    }
+            }
+
+             $putuacion[$qterm]=$matchDocs;
+            
+        }
+        
+        // normalizar segun el tamaño del contenido.
         foreach($matchDocs as $docID => $score) {
             $matchDocs[$docID] = $score/$index['docCount'][$docID];
         }
         
-        arsort($matchDocs); // high to low
-        
+        arsort($matchDocs); // odenar de mayor a menor
         var_dump($matchDocs);
-  
+        return 'El documento más asociado es el '.(key($matchDocs)+1); 
+        var_dump($matchDocs);
+        
     
+    }
+    
+    public function buscador(){
+        return View::make('buscador');
     }
 }
