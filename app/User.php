@@ -3,10 +3,11 @@
 namespace App;
 
 use App\Task;
-use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class User extends Authenticatable
-{
+
+use Illuminate\Database\Eloquent\Model;
+
+class User extends Model {
     /**
      * The attributes that are mass assignable.
      *
@@ -32,4 +33,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Task::class);
     }
+    
+    public function perfiles()
+	{
+		return $this->hasMany('App\Modelos\Perfiles', 'id');
+	}
 }

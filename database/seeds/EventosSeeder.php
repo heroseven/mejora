@@ -12,18 +12,33 @@ class EventosSeeder extends Seeder
     public function run()
     {
         DB::table('documento')->insert([
-            'titulo' => 'SAP MM - Gestión Logística - Lima',
-            'contenido' => 'es un módulo de SAP que logra amplio control en las operaciones logísticas, de almacenes y cadena de almacenes en diferentes rubros empresariales lo cual permite a los negocios optimizar sus procesos y maximizar sus recursos. El curso SAP Logística proporciona las habilidades necesarias para tener éxito en operaciones logísticas y de almacenes en diversos procesos de negocios sobre la plataforma ERP SAP',
+            'titulo' => 'sap mm - gestión logística - lima',
+            'contenido' => 'es un módulo de sap que logra amplio control en las operaciones logísticas, de almacenes y cadena de almacenes en diferentes rubros empresariales lo cual permite a los negocios optimizar sus procesos y maximizar sus recursos. el curso sap logística proporciona las habilidades necesarias para tener éxito en operaciones logísticas y de almacenes en diversos procesos de negocios sobre la plataforma erp sap',
         ]);
 
         DB::table('documento')->insert([
-            'titulo' => 'BPMN con Bizagi Nextech',
-            'contenido' => 'MODELAMIENTO DE PROCESOS CON BPMN Durante este curso taller usted aprenderá de forma práctica el estándar BPMN 2.0 el cual le permitirá plasmar los procesos de negocio actuales y deseados en forma gráfica, facilitando el entendimiento de las colaboraciones y transacciones de negocio entre grupos de trabajo, áreas funcionales y organizaciones.',
+            'titulo' => 'bpmn con bizagi nextech',
+            'contenido' => 'bpmn con bizagi nextech modelamiento de procesos con bpmn durante este curso taller usted aprenderá de forma práctica el estándar bpmn 2.0 el cual le permitirá plasmar los procesos de negocio actuales y deseados en forma gráfica facilitando el entendimiento de las colaboraciones y transacciones de negocio entre grupos de trabajo, áreas funcionales y organizaciones.',
         ]);
 
         DB::table('documento')->insert([
-            'titulo' => 'Taller Práctico de Redacción y Ortografía',
-            'contenido'=> 'una mala ortografía, las ventas podrían caer hasta un 50 % empresario de internet Un taller diferente, 100 % práctico, en el que veremos los errores de tus propios textos para que no vuelvas a cometerlos. Dictado por: Jose Enrique Escardó Steck, director de Investigación del diario Altavoz y profesor de Redacción Periodística en el Instituto ISIL',
+            'titulo' => 'taller práctico de redacción y ortografía',
+            'contenido'=> 'una mala ortografía las ventas podrían caer hasta un 50 % empresario de internet un taller diferente, 100 % práctico, en el que veremos los errores de tus propios textos para que no vuelvas a cometerlos. dictado por: jose enrique escardó steck, director de investigación del diario altavoz y profesor de redacción periodística en el instituto isil',
+        ]);
+        DB::table('documento')->insert([
+            'titulo' => 'curso de adm. sueldos y salarios',
+            'contenido'=> 'brindar herramientas modernas de administración salarial para fortalecer el manejo del personal de la empresa administración de sueldos y salarios análisis de puestos evaluación de puestos diseño del manual de evaluación categorización de puestos diseño de estructura salarial compensación variable',
+        ]);
+         DB::table('documento')->insert([
+            'titulo' => 'itil foundation nextech',
+            'contenido'=> 'itil foundation nextech itil foundation es idóneo para que mejoren sus habilidades laborales las personas involucradas en las siguientes áreas escritorio de servicios gestión de incidentes gestión de problemas gestión de cambios gestión de configuraciones y activos de servicio gestión de disponibilidad gestión de capacidad gestión de seguridad de información gestión de nivel de servicio y en general todas las áreas administrativas de ti',
+        ]);
+        
+        DB::table('users')->insert([
+            'email' => 'raul@diblasio.com',
+            'password' => 'diblasio',
+            'name'=> 'Raul Diblasio',
+            'estado'=>'1'
         ]);
 
     }

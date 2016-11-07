@@ -112,7 +112,7 @@ class SearchEngine extends Controller
         }
         
         
-        $busqueda="ejemplo un es hola las";
+        // $busqueda="ejemplo un es hola las";
         $busqueda=$request->input('terminos');
         $query = explode(" ", $busqueda);
         
@@ -145,7 +145,10 @@ class SearchEngine extends Controller
         
         arsort($matchDocs); // odenar de mayor a menor
         var_dump($matchDocs);
+        $posicion=key($matchDocs)+1;
+        echo Documento::find($posicion)->contenido;
         return 'El documento más asociado es el '.(key($matchDocs)+1); 
+        
         var_dump($matchDocs);
         
     
