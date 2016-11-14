@@ -32,27 +32,113 @@ use Elasticsearch\ClientBuilder;
 
 Route::get('indexar','SearchEngine@indexar');
 Route::get('search/{busqueda}','SearchEngine@puntuar_segun_busqueda');
-Route::post('buscador','SearchEngine@puntuacion_mayor');
+Route::post('buscador2','SearchEngine@puntuacion_mayor');
 
 Route::get('/',function (){
     return View::make('buscador');
 
 });
+Route::get('/date',function (){
+   return  date("Y-m-d H:m:s"); 
+});
 
 
-Route::get('final',function (){
+Route::post('buscador',function (Request $request){
+
+$busqueda=$request->input('terminos');
+    
+    /*
+    
+    causante de error si queremos hacer range
+    
+    Documento::reindex();
+    Documento::rebuildMapping();*/
+    Documento::addAllToIndex();
     $client = ClientBuilder::create()->build();
+    /*if(Documento::mappingExists()){
+             Documento::getMapping();
+    }*/
+    $params = array(
+        'index' => 'my_custom_index_name',
+        'type'  => 'documento'
+    );
 
-$params = array(
+
+/*"filtered": {
+      "filter": {
+        "bool": {
+          "must": [
+            {
+              "range": {
+                "date": {
+                  "gte": "2015-11-01",
+                  "lte": "2015-11-30"
+                }
+              }
+            }
+          ]
+        }
+      }
+    }*/
+    
+$now=date("Y-m-d H:i:s");
+      
+/*$params = [
     'index' => 'my_custom_index_name',
-    'type'  => 'documento'
-);
+    'type' => 'documento',
+    'body' => [
+        'query' => [
+            'bool' => [
+                'should' => [
+                    'match' => [ 'contenido' => 'procesos' ]
+                ],
+                "filter" => [
+                    "range" => [ "created_at" => [ "gte" => "2014-01-01" ]] 
+                ]
+            ]
+        ]
+    ]
+];
+*/
 
-$query = [
+
+/*'filter'=> [
+                    'range' => [
+                        'timestamp'=> [
+                            'created_at' => [
+                                'gte' => $now
+                            ]
+                        ]
+                    ]
+                ],
+*/
+
+$params = [
+    'index' => 'my_custom_index_name',
+    'type'  => 'documento',
+    'body' => [
+        'query' => [
+            'bool' => [
+                "must" => [
+                    ["match"=>['contenido'=> 'procesos']],
+                    [ "range" => [ "created_at" => ["gte" => '2014-01-01 00:00:00', "format" => "yyyy-MM-dd HH:mm:ss" ]]]
+                    
+                ]
+                
+            ]
+        ]
+    ]
+];
+
+//   [ "range" => [ "created_at" => ["gte" => '2014-01-01 00:00:00', "format" => "yyyy-MM-dd HH:mm:ss" ]]] 
+  
+    
+
+/*$query = [
     'multi_match' => [
-        'query' => 'itil',
+        'query' => $busqueda, 
         'fuzziness' => 'AUTO',
-        'fields' => ['title^3', 'contenido'],
+        'fields' => ['titulo^3', 'contenido'],
     ],
 ];
 $params = [
@@ -61,7 +147,7 @@ $params = [
     'body' => [
         'query' => $query
     ]
-];
+];*/
 
 /*
 $params['body']['query']['match']['contenido'] = 'procesos';*/

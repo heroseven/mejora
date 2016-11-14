@@ -11,7 +11,7 @@ class Documento extends Model {
 	use ElasticquentTrait;
 
 	protected $table = 'documento';
-	protected $fillable= ['id','contenido','titulo'];
+	protected $fillable= ['id','contenido','titulo','created_at'];
 	public $timestamps = true;
 
 
@@ -99,6 +99,11 @@ protected $mappingProperties = array(
       'type' => 'string',
       "analyzer" => 'default',
     ],
+    'created_at' => [
+      'type' => 'date',
+      "format" => "yyyy-MM-dd HH:mm:ss",
+      "analyzer" => 'default',
+    ]
     
   );
     
