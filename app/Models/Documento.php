@@ -21,8 +21,15 @@ class Documento extends Model {
 		return $this->hasMany('App\Modelos\Terminos_de_documento', 'id');
 	}
 	protected $indexSettings = [
-	   /*'analysis' => [
-            
+	   'analysis' => [
+            'char_filter' => [
+                'replace' => [
+                    'type' => 'mapping',
+                    'mappings' => [
+                        '&=> and '
+                    ],
+                ],
+            ],
             'filter' => [
                 'my_snow' => [
                     'type'=>'snowball',
@@ -50,8 +57,8 @@ class Documento extends Model {
                 ],
             ],
         ],
-    ];*/
-        'analysis' => [
+    ];
+      /*  'analysis' => [
             'char_filter' => [
                 'replace' => [
                     'type' => 'mapping',
@@ -73,7 +80,7 @@ class Documento extends Model {
                 ]
             ],
             'analyzer' => [
-                'default' => [
+                'default2' => [
                     'type' => 'custom',
                     'char_filter' => [
                         'html_strip',
@@ -88,21 +95,21 @@ class Documento extends Model {
                 ],
             ],
         ],
-    ];
+    ];*/
 
 protected $mappingProperties = array(
     'titulo' => [
       'type' => 'string',
-      "analyzer" => "default",
+      "analyzer" => "default2"
     ],
     'contenido' => [
       'type' => 'string',
-      "analyzer" => 'default',
+      "analyzer" => 'default2',
     ],
     'created_at' => [
       'type' => 'date',
       "format" => "yyyy-MM-dd HH:mm:ss",
-      "analyzer" => 'default',
+      "analyzer" => 'default2',
     ]
     
   );

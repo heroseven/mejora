@@ -43,23 +43,28 @@ Route::get('/date',function (){
 });
 
 
-Route::post('buscador',function (Request $request){
+Route::get('buscador',function (Request $request){
 
-$busqueda=$request->input('terminos');
+/*$busqueda=$request->input('variables');*/
+/*return $busqueda;*/
+$busqueda='proceso';  
+
+
+//es super necesario para poder obtener un analizador diferente crear un nuevo index para que jale de allí
+
+/*return 
+Documento::createIndex($shards = null, $replicas = null);*/
+   //return Documento::getMapping();
+    //causante de error si queremos hacer range
+   /*Documento::reindex();*/
+   Documento::addAllToIndex();
     
-    /*
-    
-    causante de error si queremos hacer range
-    
-    Documento::reindex();
-    Documento::rebuildMapping();*/
-    Documento::addAllToIndex();
     $client = ClientBuilder::create()->build();
     /*if(Documento::mappingExists()){
              Documento::getMapping();
     }*/
     $params = array(
-        'index' => 'my_custom_index_name',
+        'index' => 'mejora',
         'type'  => 'documento'
     );
 
@@ -113,6 +118,49 @@ $now=date("Y-m-d H:i:s");
                 ],
 */
 
+
+
+/*$params = [
+    'index' => 'my_custom_index_name',
+    'type'  => 'documento',
+    'body' => [
+        'query' => [
+            'bool' => [
+                "should" => [
+                    ["match"=> ['contenido'=> 'procesos']]
+                ],
+                "filter" =>  [
+                    [ "range" => [ "created_at" => ["gte" => '2014-01-01 00:00:00']]
+                ]
+                
+      
+                
+            ]
+        ]
+    ]
+];*/
+
+/*$params = [
+    'index' => 'my_custom_index_name',
+    'type'  => 'documento',
+    'body' => [
+        'query' => [
+            'bool' => [
+                "must" => [
+                    'multi_match' => [
+                        "explain" => true,
+                        'query' => $busqueda, 
+                        'fuzziness' => 'AUTO',
+                        'fields' => ['titulo', 'contenido'],
+                    ]
+                ]
+                
+            ]
+        ]
+    ]
+];*/
+
+/*
 $params = [
     'index' => 'my_custom_index_name',
     'type'  => 'documento',
@@ -120,40 +168,70 @@ $params = [
         'query' => [
             'bool' => [
                 "must" => [
-                    ["match"=>['contenido'=> 'procesos']],
-                    [ "range" => [ "created_at" => ["gte" => '2014-01-01 00:00:00', "format" => "yyyy-MM-dd HH:mm:ss" ]]]
+                    'multi_match' => [
+                        'query' => $busqueda, 
+                        'fuzziness' => 'AUTO',
+                        'fields' => ['titulo', 'contenido'],
+                    ],
+                    [ "range" => [ "created_at" => ["gte" => '2013-12-09 00:00:00', "format" => "yyyy-MM-dd HH:mm:ss" ]]]
                     
                 ]
                 
             ]
         ]
     ]
-];
+];*/
 
 //   [ "range" => [ "created_at" => ["gte" => '2014-01-01 00:00:00', "format" => "yyyy-MM-dd HH:mm:ss" ]]] 
   
     
 
-/*$query = [
+$query = [
     'multi_match' => [
         'query' => $busqueda, 
         'fuzziness' => 'AUTO',
         'fields' => ['titulo^3', 'contenido'],
     ],
 ];
-$params = [
-    'index' => 'my_custom_index_name',
+/*$params = [
+    'index' => 'mejora',
     'type'  => 'documento',
     'body' => [
-        'query' => $query
+        'query' => [
+            "term" => ["contenido" => "taller"]
+            ]
+        
     ]
 ];*/
+
+$params = [
+    'index' => 'mejora',
+    'type'  => 'documento',
+    'body' => [
+        
+            'query' => [
+            'bool' => [
+                "must" => [
+                    'multi_match' => [
+                        'query' => 'modela', 
+                        'fuzziness' => 'AUTO',
+                        'fields' => ['titulo', 'contenido'],
+                    ]
+                ]
+                
+            ]
+        ]
+        
+    ]
+];
 
 /*
 $params['body']['query']['match']['contenido'] = 'procesos';*/
 
 $collection = Documento::hydrateElasticsearchResult($client->search($params));
 return $collection;
+//si no se pone esto vuejs no lo detecta!!
+return response()->json( $collection);
 });
 
 
