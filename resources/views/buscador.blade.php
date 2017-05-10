@@ -8,7 +8,7 @@
                 <div class="panel-heading">Emparejar contenidos relacionados</div>
 
                 <div class="panel-body">
-                    <form method="post" class="form-horizontal" role="form" action="buscador">
+                    <form method="post" class="form-horizontal" role="form" action="buscador2">
                         Terminos a buscar: <input class="form-control" type="text" name="terminos"/>
                        
                         

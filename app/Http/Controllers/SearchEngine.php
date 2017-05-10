@@ -14,7 +14,7 @@ class SearchEngine extends Controller
 
         $documentos=Documento::all();
         $documentos=$documentos->pluck('contenido');
-
+        
         //cada posición representa un termino registrado en el diccionario
         $dictionary = array();
         $docCount = array();
@@ -55,7 +55,7 @@ class SearchEngine extends Controller
         // y el diccionario con la
         return array('docCount' => $docCount, 'dictionary' => $dictionary);
     }
-    
+        
     public function puntuar_segun_busqueda($busqueda){
         
         
@@ -153,6 +153,7 @@ class SearchEngine extends Controller
         
     
     }
+    
     
     public function buscador(){
         return View::make('buscador');

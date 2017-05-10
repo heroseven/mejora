@@ -23,8 +23,8 @@ return array(
     | Default Index Name
     |--------------------------------------------------------------------------
     |
-    | This is the index name that Elasticquent will use for all
-    | Elasticquent models.
+    | This is the index name that Elastiquent will use for all
+    | Elastiquent models.
     */
 
     'default_index' => 'mejora',

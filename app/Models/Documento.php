@@ -11,9 +11,30 @@ class Documento extends Model {
 	use ElasticquentTrait;
 
 	protected $table = 'documento';
-	protected $fillable= ['id','contenido','titulo','created_at'];
+	protected $fillable= ['id','descripcion','contenido','titulo','created_at'];
 	public $timestamps = true;
+    
+     /**
+     * The attributes that should be casted to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'titulo' => 'string',
+        'contenido' => 'string',
+        'descripcion'=>'required'
+    ];
 
+    /**
+     * Validation rules
+     *
+     * @var array
+     */
+    public static $rules = [
+        'titulo' => 'required',
+        'contenido' => 'required',
+        /*'descripcion'=>'required'*/
+    ];
 
   
 	public function terminos()
@@ -22,6 +43,7 @@ class Documento extends Model {
 	}
 	protected $indexSettings = [
 	   'analysis' => [
+	        //buscar en todos los campos 
             'char_filter' => [
                 'replace' => [
                     'type' => 'mapping',
@@ -31,10 +53,12 @@ class Documento extends Model {
                 ],
             ],
             'filter' => [
+                //lematizacion de tipo snowball y en español
                 'my_snow' => [
-                    'type'=>'snowball',
+                        'type'=>'snowball',
                     'lenguage'=>'spanish'
                 ],
+                //eliminar palabras vacias
                 'spanish_stop'=>[
                     'type'=> 'stop',
                     'stopwords'=>'_spanish_'
@@ -50,9 +74,12 @@ class Documento extends Model {
                     'tokenizer' => 'standard',
                     'filter' => [
                         'standard',
+                        //convertir todo a minúsculas
                         'lowercase',
                         'my_snow',
-                        'spanish_stop',"asciifolding"
+                        'spanish_stop',
+                        //indexar sin considerar tildes
+                        "asciifolding"
                     ],
                 ],
             ],
@@ -103,6 +130,10 @@ protected $mappingProperties = array(
       "analyzer" => "default2"
     ],
     'contenido' => [
+      'type' => 'string',
+      "analyzer" => 'default2',
+    ],
+    'descripcion' => [
       'type' => 'string',
       "analyzer" => 'default2',
     ],
