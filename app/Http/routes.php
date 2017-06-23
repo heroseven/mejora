@@ -28,22 +28,523 @@ curl http://localhost:9200
 */
 
 use App\Models\Documento;
+use App\Models\Interes;
+use App\Models\Perfil;
+use App\Models\Df;
+use App\Models\Preferencias;
 use App\Http\Controllers\SearchEngine;
 use Illuminate\Http\Request;
 use App\User;
 use App\stemm_es;
 use Elasticsearch\ClientBuilder;
 
+
+function elacticSearch($factor1){
+    $busqueda=$factor1;
+
+   Documento::addAllToIndex();
+    
+    $client = ClientBuilder::create()->build();
+    /*if(Documento::mappingExists()){
+             Documento::getMapping();
+    }*/
+    $params = array(
+        'index' => 'mejora',
+        'type'  => 'documento'
+    );
+
+   $now=date("Y-m-d H:i:s");
+      
+   $params = [
+       'index' => 'mejora',
+       'type'  => 'documento',
+       'body' => [
+           
+               'query' => [
+               'bool' => [
+                   "should" => [
+                       'multi_match' => [
+                           'query' => $busqueda, 
+                           'type' => "most_fields",
+                           'fuzziness' => '1',
+                           /*'fields' => ['contenido'],*/
+                           'fields' => ['titulo'],
+                           'tie_breaker'=> 0.3
+                       ]
+                   ]
+                   /* "minimum_should_match" => 3,*/
+                   
+               ]
+           ]
+           
+       ]
+   ];
+   
+
+//no funciona explain con eloquent, puede que con php nativo pero tendriamos
+//que ver como indexar.
+
+//funciona si hacemos el query directamente por consola.
+
+//curl -XGET 'localhost:9200/mejora/_search?pretty' -d' { "explain": true, "query" : { "term" : { "titulo" : "relevancia" } } }'
+
+
+/*
+$params['body']['query']['match']['contenido'] = 'procesos';*/
+   
+   $collection = Documento::hydrateElasticsearchResult($client->search($params));
+   return $collection;
+   //si no se pone esto vuejs no lo detecta!!
+   return response()->json( $collection);
+}
 Route::get('indexar','SearchEngine@indexar');
 Route::get('search/{busqueda}','SearchEngine@puntuar_segun_busqueda');
 Route::post('buscador2','SearchEngine@puntuacion_mayor');
+
+Route::get('vector_caracteristico','SearchEngine@vector_caracteristico');
+
+Route::get('proceso',function (){
+   return View::make('proceso');
+   
+   
+});
+
+Route::get('elasticsearch',function (){
+   return elacticSearch('paz');
+});
+//esta función permite crear los vectores caracteristicos
+Route::get('vector_caracteristico2',function (){
+ 
+        $base=['factor1','factor2','factor3','factor4','factor5'];
+        $factor1es=['exportaciones','tratado','fuerzas','paz','corrupción'];
+        foreach ($factor1es as $idFactor =>$factor1) {
+         
+           $articulos_relevantes=elacticSearch($factor1);
+            // return $puntuaciones_por_documento_factor;
+            
+           
+             foreach ($articulos_relevantes as $articulo) {
+
+                    $guardar= Preferencias::where('identificacion',$articulo->id)->first();
+               
+                     if($guardar!=null){
+                        
+                         if($factor1=='exportaciones'){
+                             $guardar->factor1=1;
+                             $guardar->save();
+                         }elseif($factor1=='tratado'){
+                             // return 'ok';
+                             $guardar->factor2=1;
+                             $guardar->save();
+                         }elseif($factor1=='fuerzas'){
+                             // return 'ok';
+                             $guardar->factor3=1;
+                             $guardar->save();
+                         }elseif($factor1=='paz'){
+                             // return 'ok';
+                             $guardar->factor4=1;
+                             $guardar->save();
+                         }elseif($factor1=='corrupción'){
+                             // return 'ok';
+                             $guardar->factor5=1;
+                             $guardar->save();
+                         }
+                        
+                       
+                         
+                        
+                     }else{
+                      
+                          $guardar = Preferencias::create(array('identificacion'=>$articulo->id));
+                          
+                         if($factor1=='exportaciones'){
+                             // return 'ok';
+                             $guardar->factor1=1;
+                             $guardar->save();
+                         }elseif($factor1=='tratado'){
+                             // return 'ok';
+                             $guardar->factor2=1;
+                             $guardar->save();
+                         }elseif($factor1=='fuerzas'){
+                             // return 'ok';
+                             $guardar->factor3=1;
+                             $guardar->save();
+                         }elseif($factor1=='paz'){
+                             // return 'ok';
+                             $guardar->factor4=1;
+                             $guardar->save();
+                         }elseif($factor1=='corrupción'){
+                             // return 'ok';
+                             $guardar->factor5=1;
+                             $guardar->save();
+                         }
+                      
+                     }
+                  
+                
+             }
+      
+             
+        }
+ 
+ 
+ 
+});
+
+
+// Route::get('calculos_matriz',function (){
+   
+//    $total_atributos=0;
+   
+//    $documentos=Preferencias::select('factor1','factor2','factor3','factor4','factor5','factor6','identificacion')->get();
+//    foreach ( $documentos as $documento) {
+//          $total_atributos=0;
+//          // return $documento;
+//          // $identificacion=$identificaciones
+//           $id_documento=$documento->identificacion;
+//           $articulo=Preferencias::where('identificacion',$id_documento)->first();
+//          // return $id;
+        
+//          // columnas de un articulo
+         
+               
+//                if($documento->factor1==1){
+//                      $total_atributos=$total_atributos+1;
+//                }
+//                 if($documento->factor2==1){
+//                      $total_atributos=$total_atributos+1;
+//                }
+//                 if($documento->factor3==1){
+//                      $total_atributos=$total_atributos+1;
+//                }
+//                 if($documento->factor4==1){
+//                      $total_atributos=$total_atributos+1;
+//                }
+//                 if($documento->factor5==1){
+//                      $total_atributos=$total_atributos+1;
+//                }
+//                 if($documento->factor6==1){
+//                      $total_atributos=$total_atributos+1;
+//                }
+//                $articulo->total_atributos=$total_atributos;
+//                $articulo->save();
+               
+          
+          
+//        }
+   
+   
+   
+   
+   
+// });
+
+
+Route::get('normalizacion_fila',function (){
+   
+   //se calcula la suma de fila
+   $total_atributos=0;
+   
+   $documentos=Preferencias::select('factor1','factor2','factor3','factor4','factor5','factor6','identificacion')->get();
+   foreach ( $documentos as $documento) {
+         $total_atributos=0;
+         // return $documento;
+         // $identificacion=$identificaciones
+          $id_documento=$documento->identificacion;
+          $articulo=Preferencias::where('identificacion',$id_documento)->first();
+         // return $id;
+        
+         // columnas de un articulo
+         
+               
+               if($documento->factor1==1){
+                     $total_atributos=$total_atributos+1;
+               }
+                if($documento->factor2==1){
+                     $total_atributos=$total_atributos+1;
+               }
+                if($documento->factor3==1){
+                     $total_atributos=$total_atributos+1;
+               }
+                if($documento->factor4==1){
+                     $total_atributos=$total_atributos+1;
+               }
+                if($documento->factor5==1){
+                     $total_atributos=$total_atributos+1;
+               }
+                if($documento->factor6==1){
+                     $total_atributos=$total_atributos+1;
+               }
+               $articulo->total_atributos=$total_atributos;
+               $articulo->save();
+               
+          
+          
+       }
+   
+   //se calcula la normalización con la suma de fila
+   
+   foreach ($documentos as $documento) {
+      
+      $articulo=Preferencias::where('identificacion',$documento->identificacion)->first();
+      
+       if( $articulo->total_atributos!=0){
+           $articulo->factor1=$articulo->factor1/ sqrt($articulo->total_atributos);
+       }else{
+           $articulo->factor1=0;
+       }
+      
+      if( $articulo->total_atributos!=0){
+           $articulo->factor2=$articulo->factor2/ sqrt($articulo->total_atributos);
+       }else{
+           $articulo->factor2=0;
+       }
+         
+      if( $articulo->total_atributos!=0){
+           $articulo->factor3=$articulo->factor3/ sqrt($articulo->total_atributos);
+       }else{
+           $articulo->factor3=0;
+       }
+       
+      if( $articulo->total_atributos!=0){
+           $articulo->factor4=$articulo->factor4/ sqrt($articulo->total_atributos);
+       }else{
+           $articulo->factor4=0;
+       }
+       
+      if( $articulo->total_atributos!=0){
+           $articulo->factor5=$articulo->factor5/ sqrt($articulo->total_atributos);
+       }else{
+           $articulo->factor5=0;
+       }
+      
+      if( $articulo->total_atributos!=0){
+           $articulo->factor6=$articulo->factor6/ sqrt($articulo->total_atributos);
+       }else{
+           $articulo->factor6=0;
+       }
+
+      
+      $articulo->save();
+   }
+   
+   
+   $id_usuario=1;
+   
+    //crear al iniciar sesion
+   $articulos=Preferencias::all();
+//  return $articulos;
+   foreach($articulos as $articulo){
+       $puntuado=Interes::create(array('id_articulo'=>$articulo->identificacion,'id_usuario'=>$id_usuario, 'interes'=>0));
+   }
+   
+});
+//se calcula el vector prototipo
+Route::get('perfil_usuario',function (){
+   
+   
+   
+   
+   $id_usuario=1;
+   $articulos=Preferencias::select('factor1','factor2','factor3','factor4','factor5','factor6','identificacion')->get();
+   $sum_factor1=0;
+   $sum_factor2=0;
+   $sum_factor3=0;
+   $sum_factor4=0;
+   $sum_factor5=0;
+   $sum_factor6=0;
+   //calculando suma de columna para cada factor
+   foreach ($articulos as $articulo) {
+      // return $articulo;
+      $factor1=$articulo->factor1;
+      $factor2=$articulo->factor2;
+      $factor3=$articulo->factor3;
+      $factor4=$articulo->factor4;
+      $factor5=$articulo->factor5;
+      $factor6=$articulo->factor6;
+      
+      $interes=Interes::where('id_articulo',$articulo->identificacion)->first();
+      if($interes!=null){
+            // echo $interes->interes;
+          $puntuacion=$factor1*$interes->interes;
+          $sum_factor1=$sum_factor1+$puntuacion;
+          
+          $puntuacion=$factor2*$interes->interes;
+          $sum_factor2=$sum_factor2+$puntuacion;
+          
+          $puntuacion=$factor3*$interes->interes;
+          $sum_factor3=$sum_factor3+$puntuacion;
+          
+          $puntuacion=$factor4*$interes->interes;
+          $sum_factor4=$sum_factor4+$puntuacion;
+          
+          $puntuacion=$factor5*$interes->interes;
+          $sum_factor5=$sum_factor5+$puntuacion;
+          
+          $puntuacion=$factor6*$interes->interes;
+          $sum_factor6=$sum_factor6+$puntuacion;
+          
+      }
+      
+   }
+   
+   //almacenar valores de cada factor en tabla perfil
+   $perfil=Perfil::where('id_usuario',$id_usuario)->first();
+    
+    if($perfil!=null){
+       $perfil->factor1=$sum_factor1;
+       $perfil->factor2=$sum_factor2;
+       $perfil->factor3=$sum_factor3;
+       $perfil->factor4=$sum_factor4;
+       $perfil->factor5=$sum_factor5;
+       $perfil->factor6=$sum_factor6;
+       $perfil->id_usuario=$id_usuario;
+       $perfil->save();
+    }else{
+       Perfil::create(
+          array('id_usuario'=>$id_usuario, 
+               'factor1'=>$sum_factor1, 
+               'factor2'=>$sum_factor2,
+               'factor3'=>$sum_factor3, 
+               'factor4'=>$sum_factor4, 
+               'factor5'=>$sum_factor5, 
+               'factor6'=>$sum_factor6));
+    }   
+         
+
+      
+  
+   
+   
+});
+//calculando el vector de DF y predicción
+Route::get('columna',function (){
+   
+   $total_articulos= count(Documento::all());
+   $articulos=Preferencias::select('factor1','factor2','factor3','factor4','factor5','factor6','identificacion')->get();
+   $sum_factor1=0;
+   $sum_factor2=0;
+   $sum_factor3=0;
+   $sum_factor4=0;
+   $sum_factor5=0;
+   $sum_factor6=0;
+   foreach ($articulos as $articulo) {
+      
+      if($articulo->factor1>0){
+         $sum_factor1+= 1;
+      }
+      if($articulo->factor2>0){
+         $sum_factor2+= 1;
+      }
+      if($articulo->factor3>0){
+         $sum_factor3+= 1;
+      }
+      if($articulo->facto4>0){
+         $sum_factor4+= 1;
+      }
+      if($articulo->factor5>0){
+         $sum_factor5+= 1;
+      }
+      if($articulo->factor6>0){
+         $sum_factor6+= 1;
+      }
+      
+    
+   }
+      //falta normalizar aquí
+      $sum_factor1= ($sum_factor1>0)? log($total_articulos/$sum_factor1) :0;
+      $sum_factor2= ($sum_factor2>0)? log($total_articulos/$sum_factor2) :0;
+      $sum_factor3= ($sum_factor3>0)? log($total_articulos/$sum_factor3) :0;
+      $sum_factor4= ($sum_factor4>0)? log($total_articulos/$sum_factor4) :0;
+      $sum_factor5= ($sum_factor5>0)? log($total_articulos/$sum_factor5) :0;
+      $sum_factor6= ($sum_factor6>0)? log($total_articulos/$sum_factor6) :0;
+      
+      $id_usuario=1;
+      $id_articulo=1;
+      $fila=Df::create(array('factor1'=>$sum_factor1,'factor2'=>$sum_factor2,'factor3'=>$sum_factor3,'factor4'=>$sum_factor4, 'factor5'=>$sum_factor5, 'factor6'=>$sum_factor6));
+/*  return 'ok';*/
+      $perfil_usuario=Perfil::where('id_usuario',$id_usuario)->first();
+      $df=Df::orderBy('created_at','desc')->first();
+     
+     
+     
+     //calculando predicción por la suma de productos de v caracteristico, perfil y DF
+      $prediccion=0;
+      // return $guardar_prediccion;
+      foreach ($articulos as $articulo) {
+         $factor1=$articulo->factor1*$perfil_usuario->factor1*$df->factor1;
+         $factor2=$articulo->factor2*$perfil_usuario->factor2*$df->factor2;
+         $factor3=$articulo->factor3*$perfil_usuario->factor3*$df->factor3;
+         $factor4=$articulo->factor4*$perfil_usuario->factor4*$df->factor4;
+         $factor5=$articulo->factor5*$perfil_usuario->factor5*$df->factor5;
+         $factor6=$articulo->factor6*$perfil_usuario->factor6*$df->factor6;
+         
+         //existen tantos articulos como tablas de interes? no
+         //suma de productos
+         $prediccion=$prediccion+$factor1+$factor2+$factor3+$factor4+$factor5+$factor6;
+         // return $prediccion;
+        
+         
+         //esta botando nulo en articulos que no encuentra.
+         $guardar_prediccion=Interes::where('id_usuario',$id_usuario)->where('id_articulo',$articulo->identificacion)->first();
+         
+         $guardar_prediccion->prediccion=$prediccion;
+         $guardar_prediccion->save();
+      }
+   
+});
+
+
+Route::get('/articulos',function (){
+   $tasks=Preferencias::with('articulo')->orderBy('identificacion','desc')->get();
+   // return $tasks;
+   return View::make('articulos',compact('tasks'));
+
+});
+
+Route::get('/recomendaciones',function (){
+   $tasks=Interes::with('articulo')->orderBy('prediccion','desc')->get();
+
+    return View::make('recomendaciones',compact('tasks'));
+
+});
+
+Route::get('/like/{id}',function ($id){
+   $id_usuario=1;
+   
+   
+  
+
+   $puntuado=Interes::where('id_articulo',$id)->first();
+   if($puntuado!=null){
+      
+      $puntuado->interes=1;
+   }else{
+      $puntuado=Interes::create(array('id_articulo'=>$id,'id_usuario'=>$id_usuario, 'interes'=>1));
+   }
+   $puntuado->save();
+   return back();
+    
+});
+Route::get('dislike/{id}',function ($id){
+   $id_usuario=1;
+   $puntuado=Interes::where('id_articulo',$id)->first();
+   if($puntuado!=null){
+      $puntuado->interes=-1;
+   }else{
+      $puntuado=Interes::create(array('id_articulo'=>$id,'id_usuario'=>$id_usuario, 'interes'=>-1));
+   }
+   $puntuado->save();
+   return back();
+});
+
 
 Route::get('/',function (){
     return View::make('buscador');
 
 });
-Route::get('/date',function (){
-   return  date("Y-m-d H:m:s"); 
+Route::get('/prueba',function (){
+    return test();
 });
 
 Route::get('/json',function (){

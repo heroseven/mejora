@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Models\Preferencias;
 use App\Models\Documento;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -13,7 +13,7 @@ class SearchEngine extends Controller
 
 
         $documentos=Documento::all();
-        $documentos=$documentos->pluck('contenido');
+        $documentos=$documentos->pluck('titulo');
         
         //cada posición representa un termino registrado en el diccionario
         $dictionary = array();
@@ -152,6 +152,236 @@ class SearchEngine extends Controller
         var_dump($matchDocs);
         
     
+    }
+    public function puntuacion_mayor_un_termino($termino){
+   
+        $index = $this->indexar();
+        $matchDocs=array();
+        //corregir error de Undefined offset: 3
+        $docCount = count($index['docCount']);
+        for($i=0;$i<$docCount;$i++){
+            $matchDocs[$i]=0;
+        }
+    
+        $qterm = $termino;
+        
+       
+          
+            if(isset($index['dictionary'][$qterm])){
+                    
+                    $entry = $index['dictionary'][$qterm];
+          
+                 
+                    foreach($entry['postings'] as $docID => $posting) {
+                        
+                    //si añadimos 1 mas tanto a $docCount y df tendremos mejores valores con pocos elementos.
+                   
+                    //este arreglo aumenta de tamaño miemtras más contenido tenga
+                    //si se encuentra una palabra x en dos articulos, el segundo chanca al primero.
+                    //no puede ser multiplicacion porque si fuera cero caga todo.
+                    $matchDocs[$docID] = $matchDocs[$docID]+$posting['tf'] * log($docCount / $entry['df'], 10);
+                    }
+            }
+
+
+        
+        // normalizar segun el tamaño del contenido.
+        foreach($matchDocs as $docID => $score) {
+            $matchDocs[$docID] = $score/$index['docCount'][$docID];
+        }
+        
+        arsort($matchDocs); // odenar de mayor a menor
+        // var_dump($matchDocs);
+        $posicion=key($matchDocs)+1;
+        // echo Documento::find($posicion)->contenido;
+        // return 'El documento más asociado es el '.(key($matchDocs)+1); 
+        
+        return $matchDocs;
+        
+    
+    }
+    
+    public function vector_caracteristico(){
+  
+        // $guardar= Preferencias::where('identificacion',132)->first();
+        //         //   return $guardar->first();
+        // $guardar->total_atributos=3;
+        // $guardar->save();
+                
+        // return $guardar;
+        $base=['factor1','factor2','factor3','factor4'];
+        $factores=['exportaciones','tratado','fuerzas','paz','bancos'];
+        foreach ($factores as $idFactor =>$factor) {
+         
+           $puntuaciones_por_documento_factor = $this->puntuacion_mayor_un_termino($factor);
+            // return $puntuaciones_por_documento_factor;
+            
+           
+             foreach ($puntuaciones_por_documento_factor as $idTitulo =>$valor) {
+                    $idTitulo=intval($idTitulo)+1;
+                    
+                   
+                    $guardar= Preferencias::where('identificacion',$idTitulo)->first();
+                //   return $guardar->first();
+                
+                    if($valor>=0.04){
+                        if($guardar!=null){
+                           
+                            if($factor=='exportaciones'){
+                                $guardar->factor1=1;
+                                $guardar->save();
+                            }elseif($factor=='tratado'){
+                                // return 'ok';
+                                $guardar->factor2=1;
+                                $guardar->save();
+                            }elseif($factor=='fuerzas'){
+                                // return 'ok';
+                                $guardar->factor3=1;
+                                $guardar->save();
+                            }elseif($factor=='paz'){
+                                // return 'ok';
+                                $guardar->factor4=1;
+                                $guardar->save();
+                            }elseif($factor=='bancos'){
+                                // return 'ok';
+                                $guardar->factor5=1;
+                                $guardar->save();
+                            }
+                           
+                          
+                            
+                           
+                        }else{
+                         
+                             $guardar = Preferencias::create(array('identificacion'=>$idTitulo));
+                             
+                            if($factor=='exportaciones'){
+                                // return 'ok';
+                                $guardar->factor1=1;
+                                $guardar->save();
+                            }elseif($factor=='tratado'){
+                                // return 'ok';
+                                $guardar->factor2=1;
+                                $guardar->save();
+                            }elseif($factor=='fuerzas'){
+                                // return 'ok';
+                                $guardar->factor3=1;
+                                $guardar->save();
+                            }elseif($factor=='paz'){
+                                // return 'ok';
+                                $guardar->factor4=1;
+                                $guardar->save();
+                            }elseif($factor=='bancos'){
+                                // return 'ok';
+                                $guardar->factor5=1;
+                                $guardar->save();
+                            }
+                         
+                        }
+                    }else{
+                        
+                        
+                          if($guardar!=null){
+                           
+                            if($factor=='exportaciones'){
+                                $guardar->factor1=0;
+                                $guardar->save();
+                            }elseif($factor=='tratado'){
+                                // return 'ok';
+                                $guardar->factor2=0;
+                                $guardar->save();
+                            }elseif($factor=='fuerzas'){
+                                // return 'ok';
+                                $guardar->factor3=0;
+                                $guardar->save();
+                            }elseif($factor=='paz'){
+                                // return 'ok';
+                                $guardar->factor4=0;
+                                $guardar->save();
+                            }elseif($factor=='bancos'){
+                                // return 'ok';
+                                $guardar->factor5=0;
+                                $guardar->save();
+                            }
+                           
+                          
+                            
+                           
+                        }else{
+                           
+                             $guardar = Preferencias::create(array('identificacion'=>$idTitulo));
+                             
+                            if($factor=='exportaciones'){
+                                // return 'ok';
+                                $guardar->factor1=0;
+                                $guardar->save();
+                            }elseif($factor=='tratado'){
+                                // return 'ok';
+                                $guardar->factor2=0;
+                                $guardar->save();
+                            }elseif($factor=='fuerzas'){
+                                // return 'ok';
+                                $guardar->factor3=0;
+                                $guardar->save();
+                            }elseif($factor=='paz'){
+                                // return 'ok';
+                                $guardar->factor4=0;
+                                $guardar->save();
+                            }elseif($factor=='bancos'){
+                                // return 'ok';
+                                $guardar->factor5=0;
+                                $guardar->save();
+                            }
+                         
+                        }
+                        
+                    }
+                    
+                    // $guardar = Preferencias::where('identificacion',$puntuacionId);
+                    // $guardar->factor."".$idFactor=$valor;
+                    // $guardar->save();
+                    
+                    // return $puntuacionId." ".$valor;
+             }
+       
+             /*
+             por un tema de optimizcion vamos a buscar los terminos en todos los 
+             documentos y vamos a almacenar los resultados de manera vertical
+             */
+             
+             
+             
+        }
+    }
+    
+    
+    public function transformación_matriz(){
+        
+        
+        $sum=0;
+        $articulos=Preferencias::all();
+        foreach ($articulos as $articulo) {
+        
+            foreach ($articulo as $factores) {
+                
+                $articulo=$articulo->first();
+                
+                foreach($factores as $factor){
+                    if($factor==1){
+                        $sum=$sum+1;
+                    }
+                    
+                  
+                }
+                foreach($factores as $factor){
+                   
+                    
+                  
+                }
+                
+            }
+                
+        }
     }
     
     
