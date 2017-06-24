@@ -34,12 +34,12 @@
                         @foreach ($tasks as $task)
                             <tr>
                                  <td class="table-text2">
-                                    <div>{{ $task->identificacion }}</div>
+                                    <div>{{ $task->articulo->id }}</div>
                                  </td>
                                 <!-- Task Name -->
                                 <td class="table-text">
                                      <div>{{ $task->articulo->titulo }}</div>
-                                     <div><a href="like/{{ $task->identificacion }}">Me gusta</a>  -  <a href="dislike/{{ $task->identificacion }}">No me gusta</a></div>
+                                     <!--<div><a href="like/{{ $task->identificacion }}">Me gusta</a>  -  <a href="dislike/{{ $task->identificacion }}">No me gusta</a></div>-->
                                 </td>
 
                                 <td class="table-text">

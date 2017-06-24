@@ -222,7 +222,7 @@ class SearchEngine extends Controller
                     
                    
                     $guardar= Preferencias::where('identificacion',$idTitulo)->first();
-                //   return $guardar->first();
+                    //return $guardar->first();
                 
                     if($valor>=0.04){
                         if($guardar!=null){

@@ -102,27 +102,27 @@
 
                 <!-- Branding Image -->
                 <a class="navbar-brand" href="{!! url('/') !!}">
-                     PRESLA RECOMMEND SYSTEM
+                     Mejora Sistema de Recomendación
                 </a>
             </div>
 
-            <div class="collapse navbar-collapse" id="app-navbar-collapse">
+            <!--<div class="collapse navbar-collapse" id="app-navbar-collapse">-->
                 <!-- Left Side Of Navbar -->
-                <ul class="nav navbar-nav">
-                    <li><a href="{!! url('/home') !!}">Home</a></li>
-                </ul>
+            <!--    <ul class="nav navbar-nav">-->
+            <!--        <li><a href="{!! url('/home') !!}">Home</a></li>-->
+            <!--    </ul>-->
 
                 <!-- Right Side Of Navbar -->
-                <ul class="nav navbar-nav navbar-right">
+            <!--    <ul class="nav navbar-nav navbar-right">-->
                     <!-- Authentication Links -->
-                    <li><a href="{!! url('/login') !!}">Login</a></li>
-                    <li><a href="{!! url('/register') !!}">Register</a></li>
-                </ul>
-            </div>
+            <!--        <li><a href="{!! url('/login') !!}">Login</a></li>-->
+            <!--        <li><a href="{!! url('/register') !!}">Register</a></li>-->
+            <!--    </ul>-->
+            <!--</div>-->
         </div>
     </nav>
 
-    <div id="page-content-wrapper">
+    <div id="page-content-wrapper" style="margin:0 auto; width:80%">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-lg-12">

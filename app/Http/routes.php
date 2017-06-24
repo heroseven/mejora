@@ -41,22 +41,19 @@ use Elasticsearch\ClientBuilder;
 
 function elacticSearch($factor1){
     $busqueda=$factor1;
-
-   Documento::addAllToIndex();
+   // Documento::reindex();
+   // Documento::addAllToIndex();
     
     $client = ClientBuilder::create()->build();
-    /*if(Documento::mappingExists()){
+    if(Documento::mappingExists()){
              Documento::getMapping();
-    }*/
-    $params = array(
-        'index' => 'mejora',
-        'type'  => 'documento'
-    );
+    }
+
 
    $now=date("Y-m-d H:i:s");
       
    $params = [
-       'index' => 'mejora',
+       'index' => 'mejora3',
        'type'  => 'documento',
        'body' => [
            
@@ -114,72 +111,62 @@ Route::get('elasticsearch',function (){
 });
 //esta función permite crear los vectores caracteristicos
 Route::get('vector_caracteristico2',function (){
- 
-        $base=['factor1','factor2','factor3','factor4','factor5'];
-        $factor1es=['exportaciones','tratado','fuerzas','paz','corrupción'];
-        foreach ($factor1es as $idFactor =>$factor1) {
+   
+//        Documento::reindex();
+//    $client = ClientBuilder::create()->build();
+// $params = [
+//     'index' => 'mejora3'
+// ];
+
+// // Create the index
+// $response = $client->indices()->create($params);
+// return Documento::addAllToIndex();
+
+      $documentos=Documento::all();
+       //crear vectores vacios para luego darles una puntuación de 1 si tienen relevancia
+       foreach ($documentos as $documento) {
+          Preferencias::create(array('identificacion'=>$documento->id));
+       }
+       
+        
+        $factores=['exportaciones','tratado','fuerzas','paz','bancos'];
+        foreach ($factores as $idFactor =>$factor) {
          
-           $articulos_relevantes=elacticSearch($factor1);
-            // return $puntuaciones_por_documento_factor;
-            
+           $articulos_relevantes=elacticSearch($factor);
+             
+           
            
              foreach ($articulos_relevantes as $articulo) {
-
+            // return $articulo;
                     $guardar= Preferencias::where('identificacion',$articulo->id)->first();
                
-                     if($guardar!=null){
-                        
-                         if($factor1=='exportaciones'){
-                             $guardar->factor1=1;
-                             $guardar->save();
-                         }elseif($factor1=='tratado'){
-                             // return 'ok';
-                             $guardar->factor2=1;
-                             $guardar->save();
-                         }elseif($factor1=='fuerzas'){
-                             // return 'ok';
-                             $guardar->factor3=1;
-                             $guardar->save();
-                         }elseif($factor1=='paz'){
-                             // return 'ok';
-                             $guardar->factor4=1;
-                             $guardar->save();
-                         }elseif($factor1=='corrupción'){
-                             // return 'ok';
-                             $guardar->factor5=1;
-                             $guardar->save();
-                         }
-                        
-                       
-                         
-                        
-                     }else{
-                      
-                          $guardar = Preferencias::create(array('identificacion'=>$articulo->id));
+                    
+                     
+                           
+                            if($factor=='exportaciones'){
+                                $guardar->factor1=1;
+                                $guardar->save();
+                            }elseif($factor=='tratado'){
+                                // return 'ok';
+                                $guardar->factor2=1;
+                                $guardar->save();
+                            }elseif($factor=='fuerzas'){
+                                // return 'ok';
+                                $guardar->factor3=1;
+                                $guardar->save();
+                            }elseif($factor=='paz'){
+                                // return 'ok';
+                                $guardar->factor4=1;
+                                $guardar->save();
+                            }elseif($factor=='bancos'){
+                                // return 'ok';
+                                $guardar->factor5=1;
+                                $guardar->save();
+                            }
+                           
                           
-                         if($factor1=='exportaciones'){
-                             // return 'ok';
-                             $guardar->factor1=1;
-                             $guardar->save();
-                         }elseif($factor1=='tratado'){
-                             // return 'ok';
-                             $guardar->factor2=1;
-                             $guardar->save();
-                         }elseif($factor1=='fuerzas'){
-                             // return 'ok';
-                             $guardar->factor3=1;
-                             $guardar->save();
-                         }elseif($factor1=='paz'){
-                             // return 'ok';
-                             $guardar->factor4=1;
-                             $guardar->save();
-                         }elseif($factor1=='corrupción'){
-                             // return 'ok';
-                             $guardar->factor5=1;
-                             $guardar->save();
-                         }
-                      
-                     }
+                            
+                       
                   
                 
              }
@@ -494,11 +481,13 @@ Route::get('columna',function (){
    
 });
 
-
-Route::get('/articulos',function (){
+//antes articulos
+Route::get('/usuario/{usuario}',function ($usuario){
+   
+   $usuario=$usuario;
    $tasks=Preferencias::with('articulo')->orderBy('identificacion','desc')->get();
    // return $tasks;
-   return View::make('articulos',compact('tasks'));
+   return View::make('articulos',compact('tasks','usuario'));
 
 });
 
@@ -509,11 +498,8 @@ Route::get('/recomendaciones',function (){
 
 });
 
-Route::get('/like/{id}',function ($id){
-   $id_usuario=1;
-   
-   
-  
+Route::get('/like/{usuario}/{id}',function ($usuario,$id){
+   $id_usuario=$usuario;
 
    $puntuado=Interes::where('id_articulo',$id)->first();
    if($puntuado!=null){
@@ -526,8 +512,10 @@ Route::get('/like/{id}',function ($id){
    return back();
     
 });
-Route::get('dislike/{id}',function ($id){
-   $id_usuario=1;
+Route::get('dislike/{usuario}/{id}',function ($usuario,$id){
+   
+   $id_usuario=$usuario;
+   
    $puntuado=Interes::where('id_articulo',$id)->first();
    if($puntuado!=null){
       $puntuado->interes=-1;

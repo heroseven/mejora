@@ -16,7 +16,7 @@
     @if (count($tasks) > 0)
         <div class="panel panel-default">
             <div class="panel-heading">
-                Recomendaciones
+                Lista de artículos para Usuario {{$usuario}}
             </div>
 
             <div class="panel-body">
@@ -39,7 +39,7 @@
                                 <!-- Task Name -->
                                 <td class="table-text">
                                      <div>{{ $task->articulo->titulo }}</div>
-                                     <div><a href="like/{{ $task->identificacion }}">Me gusta</a>  -  <a href="dislike/{{ $task->id }}">No me gusta</a></div>
+                                     <div><a href="../like/{{$usuario}}/{{ $task->identificacion }}">Me gusta</a>  -  <a href="../dislike/{{$usuario}}/{{ $task->id }}">No me gusta</a></div>
                                 </td>
 
                                
