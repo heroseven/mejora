@@ -447,7 +447,7 @@ Route::get('columna',function (){
       $sum_factor6= ($sum_factor6>0)? log($total_articulos/$sum_factor6) :0;
       
       $id_usuario=1;
-      $id_articulo=1;
+      
       $fila=Df::create(array('factor1'=>$sum_factor1,'factor2'=>$sum_factor2,'factor3'=>$sum_factor3,'factor4'=>$sum_factor4, 'factor5'=>$sum_factor5, 'factor6'=>$sum_factor6));
 /*  return 'ok';*/
       $perfil_usuario=Perfil::where('id_usuario',$id_usuario)->first();
@@ -457,8 +457,12 @@ Route::get('columna',function (){
      
      //calculando predicción por la suma de productos de v caracteristico, perfil y DF
       $prediccion=0;
+      
+      // return $articulos;
       // return $guardar_prediccion;
       foreach ($articulos as $articulo) {
+         
+        
          $factor1=$articulo->factor1*$perfil_usuario->factor1*$df->factor1;
          $factor2=$articulo->factor2*$perfil_usuario->factor2*$df->factor2;
          $factor3=$articulo->factor3*$perfil_usuario->factor3*$df->factor3;
@@ -468,7 +472,13 @@ Route::get('columna',function (){
          
          //existen tantos articulos como tablas de interes? no
          //suma de productos
+         
          $prediccion=$prediccion+$factor1+$factor2+$factor3+$factor4+$factor5+$factor6;
+         
+         // if($articulo->identificacion=='94'){
+         // return $prediccion;
+         // }
+         
          // return $prediccion;
         
          
@@ -477,6 +487,7 @@ Route::get('columna',function (){
          
          $guardar_prediccion->prediccion=$prediccion;
          $guardar_prediccion->save();
+         $prediccion=0;
       }
    
 });
@@ -493,8 +504,11 @@ Route::get('/usuario/{usuario}',function ($usuario){
 
 Route::get('/recomendaciones',function (){
    $tasks=Interes::with('articulo')->orderBy('prediccion','desc')->get();
+   
+   $articulos_calificados=Interes::where('interes','1')->get()->pluck('id_articulo');
 
-    return View::make('recomendaciones',compact('tasks'));
+
+    return View::make('recomendaciones',compact('tasks','articulos_calificados'));
 
 });
 

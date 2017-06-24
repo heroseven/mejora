@@ -41,7 +41,9 @@
                                      <div>{{ $task->articulo->titulo }}</div>
                                      <div><a href="../like/{{$usuario}}/{{ $task->identificacion }}">Me gusta</a>  -  <a href="../dislike/{{$usuario}}/{{ $task->id }}">No me gusta</a></div>
                                 </td>
-
+                                <td class="table-text">
+                                     <div>{{ $task->articulo->descripcion }}</div>
+                                </td>
                                
                             </tr>
                         @endforeach
