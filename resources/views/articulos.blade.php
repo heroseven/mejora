@@ -17,6 +17,7 @@
         <div class="panel panel-default">
             <div class="panel-heading">
                 Lista de artículos para Usuario {{$usuario}}
+                Ver recomendaciones <a href="../perfil_usuario/{{$usuario}}">Aquí</a>
             </div>
 
             <div class="panel-body">

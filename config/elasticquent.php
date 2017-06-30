@@ -27,6 +27,6 @@ return array(
     | Elastiquent models.
     */
 
-    'default_index' => 'mejora3',
+    'default_index' => 'mejora11',
 
 );

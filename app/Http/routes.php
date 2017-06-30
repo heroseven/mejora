@@ -49,11 +49,10 @@ function elacticSearch($factor1){
              Documento::getMapping();
     }
 
-
    $now=date("Y-m-d H:i:s");
       
    $params = [
-       'index' => 'mejora3',
+       'index' => 'mejora11',
        'type'  => 'documento',
        'body' => [
            
@@ -64,7 +63,7 @@ function elacticSearch($factor1){
                            'query' => $busqueda, 
                            'type' => "most_fields",
                            'fuzziness' => '1',
-                           /*'fields' => ['contenido'],*/
+                           // 'fields' => ['contenido'],
                            'fields' => ['titulo'],
                            'tie_breaker'=> 0.3
                        ]
@@ -107,74 +106,179 @@ Route::get('proceso',function (){
 });
 
 Route::get('elasticsearch',function (){
-   return elacticSearch('paz');
+   $client = ClientBuilder::create()->build();
+      $params = [
+          'index' => 'mejora11'
+      ];
+      $response = $client->indices()->create($params);
+      return Documento::addAllToIndex();
 });
+
+
+//antes de calificar por usuarios
+
+
 //esta función permite crear los vectores caracteristicos
 Route::get('vector_caracteristico2',function (){
-   
-//        Documento::reindex();
-//    $client = ClientBuilder::create()->build();
-// $params = [
-//     'index' => 'mejora3'
-// ];
+   //  $articulos_relevantes=elacticSearch('bancos');
+   //  return $articulos_relevantes;
+      //resetear index.
+   //  Documento::addAllToIndex();
+      
+       
 
-// // Create the index
-// $response = $client->indices()->create($params);
-// return Documento::addAllToIndex();
-
-      $documentos=Documento::all();
+       $documentos=Documento::all();
        //crear vectores vacios para luego darles una puntuación de 1 si tienen relevancia
        foreach ($documentos as $documento) {
           Preferencias::create(array('identificacion'=>$documento->id));
        }
-       
-        
         $factores=['exportaciones','tratado','fuerzas','paz','bancos'];
         foreach ($factores as $idFactor =>$factor) {
-         
+           
            $articulos_relevantes=elacticSearch($factor);
-             
-           
-           
+          
              foreach ($articulos_relevantes as $articulo) {
-            // return $articulo;
-                    $guardar= Preferencias::where('identificacion',$articulo->id)->first();
-               
-                    
+
+                  $guardar= Preferencias::where('identificacion',$articulo->id)->first();
+
+                  if(isset($guardar)){
                      
-                           
-                            if($factor=='exportaciones'){
+                         if($factor=='exportaciones'){
+                                
                                 $guardar->factor1=1;
                                 $guardar->save();
                             }elseif($factor=='tratado'){
-                                // return 'ok';
+                                 
                                 $guardar->factor2=1;
                                 $guardar->save();
                             }elseif($factor=='fuerzas'){
-                                // return 'ok';
+                                 
                                 $guardar->factor3=1;
                                 $guardar->save();
                             }elseif($factor=='paz'){
-                                // return 'ok';
+                                 
                                 $guardar->factor4=1;
                                 $guardar->save();
                             }elseif($factor=='bancos'){
-                                // return 'ok';
+                                 
                                 $guardar->factor5=1;
                                 $guardar->save();
                             }
+                  }
                            
-                          
-                            
-                       
-                  
                 
              }
       
              
         }
  
- 
+      
+      //normalización de fila
+      
+      
+      //se calcula la suma de fila
+   $total_atributos=0;
+   
+   $documentos=Preferencias::select('factor1','factor2','factor3','factor4','factor5','factor6','identificacion')->get();
+   foreach ( $documentos as $documento) {
+         $total_atributos=0;
+         // return $documento;
+         // $identificacion=$identificaciones
+          $id_documento=$documento->identificacion;
+          $articulo=Preferencias::where('identificacion',$id_documento)->first();
+         // return $id;
+        
+         // columnas de un articulo
+         
+               
+               if($documento->factor1==1){
+                     $total_atributos=$total_atributos+1;
+               }
+                if($documento->factor2==1){
+                     $total_atributos=$total_atributos+1;
+               }
+                if($documento->factor3==1){
+                     $total_atributos=$total_atributos+1;
+               }
+                if($documento->factor4==1){
+                     $total_atributos=$total_atributos+1;
+               }
+                if($documento->factor5==1){
+                     $total_atributos=$total_atributos+1;
+               }
+                if($documento->factor6==1){
+                     $total_atributos=$total_atributos+1;
+               }
+               $articulo->total_atributos=$total_atributos;
+               $articulo->save();
+               
+          
+          
+       }
+   
+   //se calcula la normalización con la suma de fila
+   
+   foreach ($documentos as $documento) {
+      
+      $articulo=Preferencias::where('identificacion',$documento->identificacion)->first();
+      
+       if( $articulo->total_atributos!=0){
+           $articulo->factor1=$articulo->factor1/ sqrt($articulo->total_atributos);
+       }else{
+           $articulo->factor1=0;
+       }
+      
+      if( $articulo->total_atributos!=0){
+           $articulo->factor2=$articulo->factor2/ sqrt($articulo->total_atributos);
+       }else{
+           $articulo->factor2=0;
+       }
+         
+      if( $articulo->total_atributos!=0){
+           $articulo->factor3=$articulo->factor3/ sqrt($articulo->total_atributos);
+       }else{
+           $articulo->factor3=0;
+       }
+       
+      if( $articulo->total_atributos!=0){
+           $articulo->factor4=$articulo->factor4/ sqrt($articulo->total_atributos);
+       }else{
+           $articulo->factor4=0;
+       }
+       
+      if( $articulo->total_atributos!=0){
+           $articulo->factor5=$articulo->factor5/ sqrt($articulo->total_atributos);
+       }else{
+           $articulo->factor5=0;
+       }
+      
+      if( $articulo->total_atributos!=0){
+           $articulo->factor6=$articulo->factor6/ sqrt($articulo->total_atributos);
+       }else{
+           $articulo->factor6=0;
+       }
+
+      
+      $articulo->save();
+   }
+      
+      
+      
+      // Como se ha incorporado la tabla interes para tener un interes separado por usuario
+      // es necesario crear tantas filas interes con el campo prediccion como articulos haya para obtener predicciones de articulos no puntuados 
+      // que se asemejen al vector prototipo
+      
+      
+      //la cración de los registros demora demaciado, mejor crear la columna user1,user2, por demanda con sql directo
+      
+      $articulos=Preferencias::all();
+      foreach($articulos as $articulo){
+         
+         for ($i = 1; $i < 10; $i++) {
+             $puntuado=Interes::create(array('id_articulo'=>$articulo->identificacion,'id_usuario'=>$i, 'interes'=>0));
+         }
+         
+      }
  
 });
 
@@ -316,183 +420,19 @@ Route::get('normalizacion_fila',function (){
    }
    
    
-   $id_usuario=1;
+//    $id_usuario=1;
    
-    //crear al iniciar sesion
-   $articulos=Preferencias::all();
-//  return $articulos;
-   foreach($articulos as $articulo){
-       $puntuado=Interes::create(array('id_articulo'=>$articulo->identificacion,'id_usuario'=>$id_usuario, 'interes'=>0));
-   }
-   
-});
-//se calcula el vector prototipo
-Route::get('perfil_usuario',function (){
-   
-   
-   
-   
-   $id_usuario=1;
-   $articulos=Preferencias::select('factor1','factor2','factor3','factor4','factor5','factor6','identificacion')->get();
-   $sum_factor1=0;
-   $sum_factor2=0;
-   $sum_factor3=0;
-   $sum_factor4=0;
-   $sum_factor5=0;
-   $sum_factor6=0;
-   //calculando suma de columna para cada factor
-   foreach ($articulos as $articulo) {
-      // return $articulo;
-      $factor1=$articulo->factor1;
-      $factor2=$articulo->factor2;
-      $factor3=$articulo->factor3;
-      $factor4=$articulo->factor4;
-      $factor5=$articulo->factor5;
-      $factor6=$articulo->factor6;
-      
-      $interes=Interes::where('id_articulo',$articulo->identificacion)->first();
-      if($interes!=null){
-            // echo $interes->interes;
-          $puntuacion=$factor1*$interes->interes;
-          $sum_factor1=$sum_factor1+$puntuacion;
-          
-          $puntuacion=$factor2*$interes->interes;
-          $sum_factor2=$sum_factor2+$puntuacion;
-          
-          $puntuacion=$factor3*$interes->interes;
-          $sum_factor3=$sum_factor3+$puntuacion;
-          
-          $puntuacion=$factor4*$interes->interes;
-          $sum_factor4=$sum_factor4+$puntuacion;
-          
-          $puntuacion=$factor5*$interes->interes;
-          $sum_factor5=$sum_factor5+$puntuacion;
-          
-          $puntuacion=$factor6*$interes->interes;
-          $sum_factor6=$sum_factor6+$puntuacion;
-          
-      }
-      
-   }
-   
-   //almacenar valores de cada factor en tabla perfil
-   $perfil=Perfil::where('id_usuario',$id_usuario)->first();
-    
-    if($perfil!=null){
-       $perfil->factor1=$sum_factor1;
-       $perfil->factor2=$sum_factor2;
-       $perfil->factor3=$sum_factor3;
-       $perfil->factor4=$sum_factor4;
-       $perfil->factor5=$sum_factor5;
-       $perfil->factor6=$sum_factor6;
-       $perfil->id_usuario=$id_usuario;
-       $perfil->save();
-    }else{
-       Perfil::create(
-          array('id_usuario'=>$id_usuario, 
-               'factor1'=>$sum_factor1, 
-               'factor2'=>$sum_factor2,
-               'factor3'=>$sum_factor3, 
-               'factor4'=>$sum_factor4, 
-               'factor5'=>$sum_factor5, 
-               'factor6'=>$sum_factor6));
-    }   
-         
-
-      
-  
-   
-   
-});
-//calculando el vector de DF y predicción
-Route::get('columna',function (){
-   
-   $total_articulos= count(Documento::all());
-   $articulos=Preferencias::select('factor1','factor2','factor3','factor4','factor5','factor6','identificacion')->get();
-   $sum_factor1=0;
-   $sum_factor2=0;
-   $sum_factor3=0;
-   $sum_factor4=0;
-   $sum_factor5=0;
-   $sum_factor6=0;
-   foreach ($articulos as $articulo) {
-      
-      if($articulo->factor1>0){
-         $sum_factor1+= 1;
-      }
-      if($articulo->factor2>0){
-         $sum_factor2+= 1;
-      }
-      if($articulo->factor3>0){
-         $sum_factor3+= 1;
-      }
-      if($articulo->facto4>0){
-         $sum_factor4+= 1;
-      }
-      if($articulo->factor5>0){
-         $sum_factor5+= 1;
-      }
-      if($articulo->factor6>0){
-         $sum_factor6+= 1;
-      }
-      
-    
-   }
-      //falta normalizar aquí
-      $sum_factor1= ($sum_factor1>0)? log($total_articulos/$sum_factor1) :0;
-      $sum_factor2= ($sum_factor2>0)? log($total_articulos/$sum_factor2) :0;
-      $sum_factor3= ($sum_factor3>0)? log($total_articulos/$sum_factor3) :0;
-      $sum_factor4= ($sum_factor4>0)? log($total_articulos/$sum_factor4) :0;
-      $sum_factor5= ($sum_factor5>0)? log($total_articulos/$sum_factor5) :0;
-      $sum_factor6= ($sum_factor6>0)? log($total_articulos/$sum_factor6) :0;
-      
-      $id_usuario=1;
-      
-      $fila=Df::create(array('factor1'=>$sum_factor1,'factor2'=>$sum_factor2,'factor3'=>$sum_factor3,'factor4'=>$sum_factor4, 'factor5'=>$sum_factor5, 'factor6'=>$sum_factor6));
-/*  return 'ok';*/
-      $perfil_usuario=Perfil::where('id_usuario',$id_usuario)->first();
-      $df=Df::orderBy('created_at','desc')->first();
-     
-     
-     
-     //calculando predicción por la suma de productos de v caracteristico, perfil y DF
-      $prediccion=0;
-      
-      // return $articulos;
-      // return $guardar_prediccion;
-      foreach ($articulos as $articulo) {
-         
-        
-         $factor1=$articulo->factor1*$perfil_usuario->factor1*$df->factor1;
-         $factor2=$articulo->factor2*$perfil_usuario->factor2*$df->factor2;
-         $factor3=$articulo->factor3*$perfil_usuario->factor3*$df->factor3;
-         $factor4=$articulo->factor4*$perfil_usuario->factor4*$df->factor4;
-         $factor5=$articulo->factor5*$perfil_usuario->factor5*$df->factor5;
-         $factor6=$articulo->factor6*$perfil_usuario->factor6*$df->factor6;
-         
-         //existen tantos articulos como tablas de interes? no
-         //suma de productos
-         
-         $prediccion=$prediccion+$factor1+$factor2+$factor3+$factor4+$factor5+$factor6;
-         
-         // if($articulo->identificacion=='94'){
-         // return $prediccion;
-         // }
-         
-         // return $prediccion;
-        
-         
-         //esta botando nulo en articulos que no encuentra.
-         $guardar_prediccion=Interes::where('id_usuario',$id_usuario)->where('id_articulo',$articulo->identificacion)->first();
-         
-         $guardar_prediccion->prediccion=$prediccion;
-         $guardar_prediccion->save();
-         $prediccion=0;
-      }
+//     //crear al iniciar sesion
+//    $articulos=Preferencias::all();
+// //  return $articulos;
+//    foreach($articulos as $articulo){
+//        $puntuado=Interes::create(array('id_articulo'=>$articulo->identificacion,'id_usuario'=>$id_usuario, 'interes'=>0));
+//    }
    
 });
 
-//antes articulos
+
+//mostrar articulos 
 Route::get('/usuario/{usuario}',function ($usuario){
    
    $usuario=$usuario;
@@ -502,20 +442,15 @@ Route::get('/usuario/{usuario}',function ($usuario){
 
 });
 
-Route::get('/recomendaciones',function (){
-   $tasks=Interes::with('articulo')->orderBy('prediccion','desc')->get();
-   
-   $articulos_calificados=Interes::where('interes','1')->get()->pluck('id_articulo');
 
+//calificar
 
-    return View::make('recomendaciones',compact('tasks','articulos_calificados'));
-
-});
 
 Route::get('/like/{usuario}/{id}',function ($usuario,$id){
+   
    $id_usuario=$usuario;
-
-   $puntuado=Interes::where('id_articulo',$id)->first();
+   
+   $puntuado=Interes::where('id_articulo',$id)->where('id_usuario',$id_usuario)->first();
    if($puntuado!=null){
       
       $puntuado->interes=1;
@@ -530,7 +465,7 @@ Route::get('dislike/{usuario}/{id}',function ($usuario,$id){
    
    $id_usuario=$usuario;
    
-   $puntuado=Interes::where('id_articulo',$id)->first();
+   $puntuado=Interes::where('id_articulo',$id)->where('id_usuario',$id_usuario)->first();
    if($puntuado!=null){
       $puntuado->interes=-1;
    }else{
@@ -539,6 +474,204 @@ Route::get('dislike/{usuario}/{id}',function ($usuario,$id){
    $puntuado->save();
    return back();
 });
+
+Route::group(['middleware' => ['web']], function () {
+   //despues de calificar
+
+      //se calcula el vector prototipo
+      Route::get('perfil_usuario/{usuario}',function ($usuario){
+
+         $id_usuario=$usuario;
+         $articulos=Preferencias::select('factor1','factor2','factor3','factor4','factor5','factor6','identificacion')->get();
+         $sum_factor1=0;
+         $sum_factor2=0;
+         $sum_factor3=0;
+         $sum_factor4=0;
+         $sum_factor5=0;
+         $sum_factor6=0;
+         //calculando suma de columna para cada factor
+         foreach ($articulos as $articulo) {
+            // return $articulo;
+            $factor1=$articulo->factor1;
+            $factor2=$articulo->factor2;
+            $factor3=$articulo->factor3;
+            $factor4=$articulo->factor4;
+            $factor5=$articulo->factor5;
+            $factor6=$articulo->factor6;
+            
+            $interes=Interes::where('id_articulo',$articulo->identificacion)->where('id_usuario',$id_usuario)->first();
+            
+            if(isset($interes)){
+               
+               //se realiza una suma de productos de la puntuación del usuario para un articulo1 con la puntuación del factor1 si existe
+               //puntuacion es una variable auxiliar sin importancia
+               if($interes!=null){
+                     // echo $interes->interes;
+                   $puntuacion=$factor1*$interes->interes;
+                   $sum_factor1=$sum_factor1+$puntuacion;
+                   
+                   $puntuacion=$factor2*$interes->interes;
+                   $sum_factor2=$sum_factor2+$puntuacion;
+                   
+                   $puntuacion=$factor3*$interes->interes;
+                   $sum_factor3=$sum_factor3+$puntuacion;
+                   
+                   $puntuacion=$factor4*$interes->interes;
+                   $sum_factor4=$sum_factor4+$puntuacion;
+                   
+                   $puntuacion=$factor5*$interes->interes;
+                   $sum_factor5=$sum_factor5+$puntuacion;
+                   
+                   $puntuacion=$factor6*$interes->interes;
+                   $sum_factor6=$sum_factor6+$puntuacion;
+                   
+               }
+            }
+         }
+         
+         //almacenar valores de cada factor en tabla perfil
+         $perfil=Perfil::where('id_usuario',$id_usuario)->first();
+          
+          if($perfil!=null){
+             $perfil->factor1=$sum_factor1;
+             $perfil->factor2=$sum_factor2;
+             $perfil->factor3=$sum_factor3;
+             $perfil->factor4=$sum_factor4;
+             $perfil->factor5=$sum_factor5;
+             $perfil->factor6=$sum_factor6;
+             $perfil->id_usuario=$id_usuario;
+             $perfil->save();
+          }else{
+             Perfil::create(
+                array('id_usuario'=>$id_usuario, 
+                     'factor1'=>$sum_factor1, 
+                     'factor2'=>$sum_factor2,
+                     'factor3'=>$sum_factor3, 
+                     'factor4'=>$sum_factor4, 
+                     'factor5'=>$sum_factor5, 
+                     'factor6'=>$sum_factor6));
+          }   
+               
+      
+           //calculando el vector de DF 
+           
+           //contar valores en una columan mayores a 0
+
+         $total_articulos= count(Documento::all());
+         $articulos=Preferencias::select('factor1','factor2','factor3','factor4','factor5','factor6','identificacion')->get();
+         $sum_factor1=0;
+         $sum_factor2=0;
+         $sum_factor3=0;
+         $sum_factor4=0;
+         $sum_factor5=0;
+         $sum_factor6=0;
+         foreach ($articulos as $articulo) {
+            
+            if($articulo->factor1>0){
+               $sum_factor1+= 1;
+            }
+            if($articulo->factor2>0){
+               $sum_factor2+= 1;
+            }
+            if($articulo->factor3>0){
+               $sum_factor3+= 1;
+            }
+            if($articulo->facto4>0){
+               $sum_factor4+= 1;
+            }
+            if($articulo->factor5>0){
+               $sum_factor5+= 1;
+            }
+            if($articulo->factor6>0){
+               $sum_factor6+= 1;
+            }
+            
+          
+         }
+            //aplicar la normalización de datos
+            
+            $sum_factor1= ($sum_factor1>0)? log($total_articulos/$sum_factor1) :0;
+            $sum_factor2= ($sum_factor2>0)? log($total_articulos/$sum_factor2) :0;
+            $sum_factor3= ($sum_factor3>0)? log($total_articulos/$sum_factor3) :0;
+            $sum_factor4= ($sum_factor4>0)? log($total_articulos/$sum_factor4) :0;
+            $sum_factor5= ($sum_factor5>0)? log($total_articulos/$sum_factor5) :0;
+            $sum_factor6= ($sum_factor6>0)? log($total_articulos/$sum_factor6) :0;
+            
+            //almacenar en tabla DF
+            
+            
+            //por cada usuario habria una fila pero sería con el mismo valor.
+            $fila=Df::create(array('factor1'=>$sum_factor1,'factor2'=>$sum_factor2,'factor3'=>$sum_factor3,'factor4'=>$sum_factor4, 'factor5'=>$sum_factor5, 'factor6'=>$sum_factor6));
+            /*  return 'ok';*/
+            
+            
+            $perfil_usuario=Perfil::where('id_usuario',$id_usuario)->first();
+            
+            $df=Df::orderBy('created_at','desc')->first();
+           
+           
+           
+           //calculando predicción por la suma de productos de v caracteristico, perfil y DF
+            $prediccion=0;
+
+            foreach ($articulos as $articulo) {
+               
+              
+               $factor1=$articulo->factor1*$perfil_usuario->factor1*$df->factor1;
+               $factor2=$articulo->factor2*$perfil_usuario->factor2*$df->factor2;
+               $factor3=$articulo->factor3*$perfil_usuario->factor3*$df->factor3;
+               $factor4=$articulo->factor4*$perfil_usuario->factor4*$df->factor4;
+               $factor5=$articulo->factor5*$perfil_usuario->factor5*$df->factor5;
+               $factor6=$articulo->factor6*$perfil_usuario->factor6*$df->factor6;
+               
+               //existen tantos articulos como tablas de interes? no
+               //suma de productos
+               
+               $prediccion=$prediccion+$factor1+$factor2+$factor3+$factor4+$factor5+$factor6;
+               
+               // if($articulo->identificacion=='94'){
+               // return $prediccion;
+               // }
+               
+               // return $prediccion;
+              
+               
+               //esta botando nulo en articulos que no encuentra.
+               $guardar_prediccion=Interes::where('id_usuario',$id_usuario)->where('id_articulo',$articulo->identificacion)->first();
+               
+               if(isset($guardar_prediccion)){
+                  
+                  $guardar_prediccion->prediccion=$prediccion;
+                  $guardar_prediccion->save();
+                  $prediccion=0;
+               }
+               
+              
+            } 
+            Session::put('id_usuario',$id_usuario);
+            return redirect('recomendaciones');
+         
+      });
+
+      Route::get('columna',function (){
+         
+         
+         
+      });
+      
+      Route::get('/recomendaciones',function (Request $request){
+         
+         $usuario=Session::get('id_usuario');
+         $tasks=Preferencias::all();
+         
+         $articulos=Interes::where('id_usuario',$usuario)->with('articulo')->orderBy('prediccion','desc')->get();
+          return View::make('recomendaciones',compact('tasks','articulos', 'usuario'));
+      
+      });
+
+});
+
+
 
 
 Route::get('/',function (){

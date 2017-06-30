@@ -16,7 +16,7 @@
     @if (count($tasks) > 0)
         <div class="panel panel-default">
             <div class="panel-heading">
-                Recomendaciones
+                Recomendaciones - <a href="usuario/{{$usuario}}">Seguir calificando artículos</a>
             </div>
 
             <div class="panel-body">
@@ -33,50 +33,31 @@
                     <!-- Table Body -->
                     <tbody>
                         
-                        @foreach ($tasks as $task)
+                       
                            
+                                @foreach($articulos as $articulo)
+                               
+                               
+                                         <tr>
+                                     <td class="table-text2">
+                                        <div>{{ $articulo->articulo->id }}</div>
+                                     </td>
+                                    <!-- Task Name -->
+                                    <td class="table-text">
+                                         <div>{{ $articulo->articulo->titulo }}</div>
+                                     </td>
+                                     <td class="table-text">
+                                         <div>{{ $articulo->articulo->descripcion }}</div>
+                                    </td>
+    
+                                    <td class="table-text">
+                                         <div>{{ $articulo->prediccion }}%</div>
+                                    </td>
+                                </tr>
                                 
-                                @if($articulos_calificados[0]==$task->articulo->id or $articulos_calificados[1]==$task->articulo->id)
-                                     <tr style="color:red">
-                                 <td class="table-text2">
-                                    <div>{{ $task->articulo->id }}</div>
-                                 </td>
-                                <!-- Task Name -->
-                                <td class="table-text">
-                                     <div>{{ $task->articulo->titulo }}</div>
-                                     <!--<div><a href="like/{{ $task->identificacion }}">Me gusta</a>  -  <a href="dislike/{{ $task->identificacion }}">No me gusta</a></div>-->
-                                </td>
-                                 <td class="table-text">
-                                     <div>{{ $task->articulo->descripcion }}</div>
-                                </td>
-
-                                <td class="table-text">
-                                     <div>{{ $task->prediccion }}%</div>
-                                </td>
-                            </tr>
+                              
                                 
-                                @else
-                                     <tr>
-                                 <td class="table-text2">
-                                    <div>{{ $task->articulo->id }}</div>
-                                 </td>
-                                <!-- Task Name -->
-                                <td class="table-text">
-                                     <div>{{ $task->articulo->titulo }}</div>
-                                     <!--<div><a href="like/{{ $task->identificacion }}">Me gusta</a>  -  <a href="dislike/{{ $task->identificacion }}">No me gusta</a></div>-->
-                                </td>
-                                 <td class="table-text">
-                                     <div>{{ $task->articulo->descripcion }}</div>
-                                </td>
-
-                                <td class="table-text">
-                                     <div>{{ $task->prediccion }}%</div>
-                                </td>
-                            </tr>
-                                @endif
-                                
-                  
-                           
+                        
                         @endforeach
                     </tbody>
                 </table>
