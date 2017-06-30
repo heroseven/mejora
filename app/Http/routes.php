@@ -37,6 +37,8 @@ use Illuminate\Http\Request;
 use App\User;
 use App\stemm_es;
 use Elasticsearch\ClientBuilder;
+Requests::register_autoloader();
+
 
 
 function elacticSearch($factor1){
@@ -64,7 +66,7 @@ function elacticSearch($factor1){
                            'type' => "most_fields",
                            'fuzziness' => '1',
                            // 'fields' => ['contenido'],
-                           'fields' => ['titulo^3','descripcion','contenido'],
+                           'fields' => ['titulo','contenido'],
                            'tie_breaker'=> 0.3
                        ]
                    ]
@@ -105,6 +107,9 @@ Route::get('proceso',function (){
    return View::make('proceso',compact('articulos_con_valor'));
    
 });
+
+
+
 
 Route::get('elasticsearch',function (){
    $client = ClientBuilder::create()->build();
@@ -441,12 +446,12 @@ Route::group(['middleware' => ['web']], function () {
          }
             //aplicar la normalización de datos
             
-            $sum_factor1= ($sum_factor1>0)? log($total_articulos/$sum_factor1) :0;
-            $sum_factor2= ($sum_factor2>0)? log($total_articulos/$sum_factor2) :0;
-            $sum_factor3= ($sum_factor3>0)? log($total_articulos/$sum_factor3) :0;
-            $sum_factor4= ($sum_factor4>0)? log($total_articulos/$sum_factor4) :0;
-            $sum_factor5= ($sum_factor5>0)? log($total_articulos/$sum_factor5) :0;
-            $sum_factor6= ($sum_factor6>0)? log($total_articulos/$sum_factor6) :0;
+            $sum_factor1= ($sum_factor1>0)? log10($total_articulos/$sum_factor1) :0;
+            $sum_factor2= ($sum_factor2>0)? log10($total_articulos/$sum_factor2) :0;
+            $sum_factor3= ($sum_factor3>0)? log10($total_articulos/$sum_factor3) :0;
+            $sum_factor4= ($sum_factor4>0)? log10($total_articulos/$sum_factor4) :0;
+            $sum_factor5= ($sum_factor5>0)? log10($total_articulos/$sum_factor5) :0;
+            $sum_factor6= ($sum_factor6>0)? log10($total_articulos/$sum_factor6) :0;
             
             //almacenar en tabla DF
             
@@ -1231,6 +1236,25 @@ Route::get('/json',function (){
          array('titulo' =>$documento->title,
                'descripcion'=>$documento->description,
                'contenido'=>$documento->narrative));
+               
+
+   }
+   return 'ok';   
+});
+
+Route::get('/webhose',function (){
+    
+    $url = "https://webhose.io/filterWebContent?token=9ad77f90-11cf-4507-9c26-631bbbf2ba29&format=json&ts=1498661636683&sort=crawled&q=%27gesti%C3%B3n%20empresarial%27";
+    $headers = array("Content-Type" => "application/json", "Accept" => "application/json");
+
+    $response = Requests::post($url, $headers);
+    
+    $documentos= json_decode($response->body)->posts;
+   foreach ($documentos as $documento) {
+
+      Documento::create(
+         array('titulo' =>$documento->title,
+               'contenido'=>$documento->text));
                
 
    }

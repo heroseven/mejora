@@ -51,7 +51,7 @@
                                     </td>
     
                                     <td class="table-text">
-                                         <div>{{ $articulo->prediccion }}%</div>
+                                         <div>{{ $articulo->prediccion*100 }}%</div>
                                     </td>
                                 </tr>
                                 

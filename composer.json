@@ -11,7 +11,8 @@
         "infyomlabs/laravel-generator": "5.2.x-dev",
         "laravelcollective/html": "5.2.*",
         "infyomlabs/adminlte-templates": "5.2.x-dev",
-        "doctrine/dbal": "~2.3"
+        "doctrine/dbal": "~2.3",
+        "rmccue/requests": "^1.7"
         },
     "require-dev": {
         "fzaninotto/faker": "~1.4",

@@ -14,12 +14,12 @@ class CraateTableDf extends Migration
     {
         Schema::create('df', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('factor1');
-            $table->integer('factor2');
-            $table->integer('factor3');
-            $table->integer('factor4');
-            $table->integer('factor5');
-            $table->integer('factor6');
+            $table->float('factor1');
+            $table->float('factor2');
+            $table->float('factor3');
+            $table->float('factor4');
+            $table->float('factor5');
+            $table->float('factor6');
             $table->timestamps();
             
            
