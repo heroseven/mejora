@@ -64,7 +64,7 @@ function elacticSearch($factor1){
                            'type' => "most_fields",
                            'fuzziness' => '1',
                            // 'fields' => ['contenido'],
-                           'fields' => ['titulo'],
+                           'fields' => ['titulo^3','descripcion','contenido'],
                            'tie_breaker'=> 0.3
                        ]
                    ]
@@ -100,8 +100,9 @@ Route::post('buscador2','SearchEngine@puntuacion_mayor');
 Route::get('vector_caracteristico','SearchEngine@vector_caracteristico');
 
 Route::get('proceso',function (){
-   return View::make('proceso');
    
+   $articulos_con_valor=Preferencias::where('total_atributos','>',0)->get();
+   return View::make('proceso',compact('articulos_con_valor'));
    
 });
 
@@ -282,161 +283,11 @@ Route::get('vector_caracteristico2',function (){
  
 });
 
-
-// Route::get('calculos_matriz',function (){
-   
-//    $total_atributos=0;
-   
-//    $documentos=Preferencias::select('factor1','factor2','factor3','factor4','factor5','factor6','identificacion')->get();
-//    foreach ( $documentos as $documento) {
-//          $total_atributos=0;
-//          // return $documento;
-//          // $identificacion=$identificaciones
-//           $id_documento=$documento->identificacion;
-//           $articulo=Preferencias::where('identificacion',$id_documento)->first();
-//          // return $id;
-        
-//          // columnas de un articulo
-         
-               
-//                if($documento->factor1==1){
-//                      $total_atributos=$total_atributos+1;
-//                }
-//                 if($documento->factor2==1){
-//                      $total_atributos=$total_atributos+1;
-//                }
-//                 if($documento->factor3==1){
-//                      $total_atributos=$total_atributos+1;
-//                }
-//                 if($documento->factor4==1){
-//                      $total_atributos=$total_atributos+1;
-//                }
-//                 if($documento->factor5==1){
-//                      $total_atributos=$total_atributos+1;
-//                }
-//                 if($documento->factor6==1){
-//                      $total_atributos=$total_atributos+1;
-//                }
-//                $articulo->total_atributos=$total_atributos;
-//                $articulo->save();
-               
-          
-          
-//        }
-   
-   
-   
-   
-   
-// });
-
-
-Route::get('normalizacion_fila',function (){
-   
-   //se calcula la suma de fila
-   $total_atributos=0;
-   
-   $documentos=Preferencias::select('factor1','factor2','factor3','factor4','factor5','factor6','identificacion')->get();
-   foreach ( $documentos as $documento) {
-         $total_atributos=0;
-         // return $documento;
-         // $identificacion=$identificaciones
-          $id_documento=$documento->identificacion;
-          $articulo=Preferencias::where('identificacion',$id_documento)->first();
-         // return $id;
-        
-         // columnas de un articulo
-         
-               
-               if($documento->factor1==1){
-                     $total_atributos=$total_atributos+1;
-               }
-                if($documento->factor2==1){
-                     $total_atributos=$total_atributos+1;
-               }
-                if($documento->factor3==1){
-                     $total_atributos=$total_atributos+1;
-               }
-                if($documento->factor4==1){
-                     $total_atributos=$total_atributos+1;
-               }
-                if($documento->factor5==1){
-                     $total_atributos=$total_atributos+1;
-               }
-                if($documento->factor6==1){
-                     $total_atributos=$total_atributos+1;
-               }
-               $articulo->total_atributos=$total_atributos;
-               $articulo->save();
-               
-          
-          
-       }
-   
-   //se calcula la normalización con la suma de fila
-   
-   foreach ($documentos as $documento) {
-      
-      $articulo=Preferencias::where('identificacion',$documento->identificacion)->first();
-      
-       if( $articulo->total_atributos!=0){
-           $articulo->factor1=$articulo->factor1/ sqrt($articulo->total_atributos);
-       }else{
-           $articulo->factor1=0;
-       }
-      
-      if( $articulo->total_atributos!=0){
-           $articulo->factor2=$articulo->factor2/ sqrt($articulo->total_atributos);
-       }else{
-           $articulo->factor2=0;
-       }
-         
-      if( $articulo->total_atributos!=0){
-           $articulo->factor3=$articulo->factor3/ sqrt($articulo->total_atributos);
-       }else{
-           $articulo->factor3=0;
-       }
-       
-      if( $articulo->total_atributos!=0){
-           $articulo->factor4=$articulo->factor4/ sqrt($articulo->total_atributos);
-       }else{
-           $articulo->factor4=0;
-       }
-       
-      if( $articulo->total_atributos!=0){
-           $articulo->factor5=$articulo->factor5/ sqrt($articulo->total_atributos);
-       }else{
-           $articulo->factor5=0;
-       }
-      
-      if( $articulo->total_atributos!=0){
-           $articulo->factor6=$articulo->factor6/ sqrt($articulo->total_atributos);
-       }else{
-           $articulo->factor6=0;
-       }
-
-      
-      $articulo->save();
-   }
-   
-   
-//    $id_usuario=1;
-   
-//     //crear al iniciar sesion
-//    $articulos=Preferencias::all();
-// //  return $articulos;
-//    foreach($articulos as $articulo){
-//        $puntuado=Interes::create(array('id_articulo'=>$articulo->identificacion,'id_usuario'=>$id_usuario, 'interes'=>0));
-//    }
-   
-});
-
-
 //mostrar articulos 
 Route::get('/usuario/{usuario}',function ($usuario){
    
    $usuario=$usuario;
-   $tasks=Preferencias::with('articulo')->orderBy('identificacion','desc')->get();
+   $tasks=Preferencias::where('total_atributos','>',0)->with('articulo')->orderBy('identificacion','desc')->get();
    // return $tasks;
    return View::make('articulos',compact('tasks','usuario'));
 
@@ -653,18 +504,13 @@ Route::group(['middleware' => ['web']], function () {
          
       });
 
-      Route::get('columna',function (){
-         
-         
-         
-      });
       
       Route::get('/recomendaciones',function (Request $request){
          
          $usuario=Session::get('id_usuario');
          $tasks=Preferencias::all();
          
-         $articulos=Interes::where('id_usuario',$usuario)->with('articulo')->orderBy('prediccion','desc')->get();
+         $articulos=Interes::where('id_usuario',$usuario)->where('prediccion','>','0')->with('articulo')->orderBy('prediccion','desc')->get();
           return View::make('recomendaciones',compact('tasks','articulos', 'usuario'));
       
       });

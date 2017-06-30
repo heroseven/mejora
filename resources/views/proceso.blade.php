@@ -26,10 +26,15 @@
             <a href="vector_caracteristico2">4. Crear vector caracteristico (Solo permite crear el diccionario una vez)</a></br>
             <a href="">5. Calificar artículos</a></br>
             
-            @for($i=1; $i<=29;$i++)
+            @for($i=1; $i<=11;$i++)
                 <a href="usuario/{{$i}}">Usuario {{$i}}</a></br>
             @endfor
             
+            <ul>
+            @foreach ($articulos_con_valor as $articulo)
+                <li>{{$articulo->id}}</li>
+            @endforeach
+            </ul>
             </div>
         </div>
    
