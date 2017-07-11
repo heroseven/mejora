@@ -31,6 +31,7 @@ use App\Models\Documento;
 use App\Models\Interes;
 use App\Models\Perfil;
 use App\Models\Df;
+use App\Models\Mape;
 use App\Models\Preferencias;
 use App\Http\Controllers\SearchEngine;
 use Illuminate\Http\Request;
@@ -108,6 +109,7 @@ Route::get('proceso',function (){
    
 });
 
+ 
 
 
 
@@ -123,13 +125,21 @@ Route::get('elasticsearch',function (){
 
 //antes de calificar por usuarios
 
+Route::get('rubro/usuario/{id}',function ($id){
+   
+   
+   return View::make('interes',compact('id'));
+   
+});
+
+
 
 //esta función permite crear los vectores caracteristicos
 Route::get('vector_caracteristico2',function (){
    //  $articulos_relevantes=elacticSearch('bancos');
    //  return $articulos_relevantes;
       //resetear index.
-   //  Documento::addAllToIndex();
+      Documento::addAllToIndex();
       
        
 
@@ -138,34 +148,34 @@ Route::get('vector_caracteristico2',function (){
        foreach ($documentos as $documento) {
           Preferencias::create(array('identificacion'=>$documento->id));
        }
-        $factores=['exportaciones','tratado','fuerzas','paz','bancos'];
+        $factores=['marketing','calidad','exportaciones','formalización','atención al cliente'];
         foreach ($factores as $idFactor =>$factor) {
            
            $articulos_relevantes=elacticSearch($factor);
-          
+
              foreach ($articulos_relevantes as $articulo) {
 
                   $guardar= Preferencias::where('identificacion',$articulo->id)->first();
 
                   if(isset($guardar)){
                      
-                         if($factor=='exportaciones'){
+                         if($factor==$factores[0]){
                                 
                                 $guardar->factor1=1;
                                 $guardar->save();
-                            }elseif($factor=='tratado'){
+                            }elseif($factor==$factores[1]){
                                  
                                 $guardar->factor2=1;
                                 $guardar->save();
-                            }elseif($factor=='fuerzas'){
+                            }elseif($factor==$factores[2]){
                                  
                                 $guardar->factor3=1;
                                 $guardar->save();
-                            }elseif($factor=='paz'){
+                            }elseif($factor==$factores[3]){
                                  
                                 $guardar->factor4=1;
                                 $guardar->save();
-                            }elseif($factor=='bancos'){
+                            }elseif($factor==$factores[4]){
                                  
                                 $guardar->factor5=1;
                                 $guardar->save();
@@ -299,6 +309,16 @@ Route::get('/usuario/{usuario}',function ($usuario){
 });
 
 
+
+//ver más detalles
+
+Route::get('/detalle/{usuario}/{id}',function ($usuario,$id){
+   
+   $documento=Documento::find($id);
+   
+   return View::make('detalle',compact('documento','usuario','id'));
+    
+});
 //calificar
 
 
@@ -332,10 +352,39 @@ Route::get('dislike/{usuario}/{id}',function ($usuario,$id){
 });
 
 Route::group(['middleware' => ['web']], function () {
+   
+   //antes de calificar
+   Route::post('intereses',function (Request $request){
+      
+   //obtener nombre del rubro
+      $rubro=$request->input('rubro');
+   //obtener nombre de los intereses
+
+      $intereses=$request->input('interes');
+     
+      $artificio='';
+      foreach ($intereses as $interes) {
+         $artificio=$artificio.','."'".$interes."'";
+      }
+      Session::put('factores',"'".$rubro."'".$artificio);
+      $id=$request->input('id');
+   return redirect('usuario/'.$id);
+   
+   });
+   
    //despues de calificar
 
       //se calcula el vector prototipo
       Route::get('perfil_usuario/{usuario}',function ($usuario){
+
+
+
+         //se obtienen los codigos de los factores de agrado
+         
+         //se selecciona la matriz de articulos relacionada a esos factores 
+         
+         //
+         $factores=Session::get('factores');
 
          $id_usuario=$usuario;
          $articulos=Preferencias::select('factor1','factor2','factor3','factor4','factor5','factor6','identificacion')->get();
@@ -517,6 +566,68 @@ Route::group(['middleware' => ['web']], function () {
          
          $articulos=Interes::where('id_usuario',$usuario)->where('prediccion','>','0')->with('articulo')->orderBy('prediccion','desc')->get();
           return View::make('recomendaciones',compact('tasks','articulos', 'usuario'));
+      
+      });
+      
+      Route::post('/encuesta',function (Request $request){
+         
+         $puntuacion=$request->input('puntuacion');
+        
+         $id_articulos=$request->input('id');
+         
+         foreach ($id_articulos as $id_articulo) {
+               $articulo=Interes::find($id_articulo);
+               $articulo->satisfaccion=$puntuacion[$id_articulo];
+               $articulo->save();
+         }
+         return 'Gracias por participar en la encuesta.';
+         
+        
+         
+      
+      });
+      
+      
+      Route::get('/mape/{usuario}',function (Request $request, $usuario){
+         
+         //para todos los articulos para el usuario 1 que tengan una satisfacción.
+         $articulos=Interes::where('id_usuario',$usuario)->where('satisfaccion','!=','0')->get();
+         $suma_errores=0;
+         $cantidad=count($articulos);
+         foreach ($articulos as $articulo) {
+               $prediccion=$articulo->prediccion*100;
+               if($prediccion>100){
+                  $prediccion=100;
+               }
+               
+               
+               $real=$articulo->satisfaccion;
+               $diff=abs($prediccion-$real);
+               $error_absoluto_porcentual=$diff/$real;
+               $suma_errores=$suma_errores+$error_absoluto_porcentual;
+         }
+         
+         $mape=$suma_errores/$cantidad;
+         Mape::create(array('id_usuario'=>$usuario,'mape'=>$mape));
+         
+         // $usuarios=9;
+         // $mape_promedio=0;
+         // for ($i = 0; $i < $usuarios; $i++) {
+             
+             
+         //     $mape=Mape::where('id_usuario',$i)->first();
+             
+             
+         //     $mape_promedio=$mape_promedio+$mape->mape;
+         // }
+         // //suma entre cantidad de usuarios
+         // $mape_promedio=$mape_promedio/$usuarios;
+         
+         //  return "El mape promedio tiene es ".$mape_promedio;
+         
+     return 'El mape para el usuario '.$usuario. " es ".$mape."%";
+         
+         
       
       });
 
@@ -1258,6 +1369,30 @@ Route::get('/webhose',function (){
                
 
    }
+   
+   $siguiente=json_decode($response->body)->next;
+   if($siguiente){
+      
+      
+         $url = "https://webhose.io/".$siguiente;
+         $headers = array("Content-Type" => "application/json", "Accept" => "application/json");
+         
+         $response = Requests::post($url, $headers);
+         
+         $documentos= json_decode($response->body)->posts;
+         
+         foreach ($documentos as $documento) {
+         
+            Documento::create(
+               array('titulo' =>$documento->title,
+                     'contenido'=>$documento->text));
+         }
+            
+            
+   }
+   
+   
+   
    return 'ok';   
 });
 

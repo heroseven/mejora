@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Interes extends Model {
 
 	protected $table = 'interes';
-	protected $fillable= ['id','id_articulo','id_usuario','interes','prediccion'];
+	protected $fillable= ['id','id_articulo','id_usuario','interes','prediccion','satisfaccion','error'];
 	public $timestamps = true;
 	
 	public function articulo(){

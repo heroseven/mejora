@@ -58,11 +58,8 @@ class Documento extends Model {
                         'type'=>'snowball',
                     'lenguage'=>'spanish'
                 ],
-                //eliminar palabras vacias
-                'spanish_stop'=>[
-                    'type'=> 'stop',
-                    'stopwords'=>'_spanish_'
-                ]
+               
+               
             ],
             'analyzer' => [
                 'default2' => [

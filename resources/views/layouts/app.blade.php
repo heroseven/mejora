@@ -101,8 +101,9 @@
                 </button>
 
                 <!-- Branding Image -->
-                <a class="navbar-brand" href="{!! url('/') !!}">
-                     Mejora Sistema de Recomendación
+                <a class="navbar-brand" href="http://mejora-heroseven.c9users.io/public/proceso">
+                    <span>Mejora - Sistema de Recomendación</span>
+                    </br>
                 </a>
             </div>
 

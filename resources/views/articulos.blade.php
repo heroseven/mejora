@@ -17,7 +17,7 @@
         <div class="panel panel-default">
             <div class="panel-heading">
                 Lista de artículos para Usuario {{$usuario}}
-                Ver recomendaciones <a href="../perfil_usuario/{{$usuario}}">Aquí</a>
+                - <a href="../perfil_usuario/{{$usuario}}">Ver recomendaciones </a>
             </div>
 
             <div class="panel-body">
@@ -27,7 +27,7 @@
                     <thead>
                         <th>Identificación</th>
                         <th>Artículo</th>
-                        
+                        <th>Ver más</th>
                     </thead>
 
                     <!-- Table Body -->
@@ -42,8 +42,12 @@
                                      <div>{{ $task->articulo->titulo }}</div>
                                      <div><a href="../like/{{$usuario}}/{{ $task->identificacion }}">Me gusta</a>  -  <a href="../dislike/{{$usuario}}/{{ $task->id }}">No me gusta</a></div>
                                 </td>
-                                <td class="table-text">
+                               <!-- <td class="table-text">
                                      <div>{{ $task->articulo->descripcion }}</div>
+                                </td>-->
+                                 <td class="table-text">
+                                     
+                                     <div><a href="../detalle/{{$usuario}}/{{ $task->identificacion }}">Ver más</a> </div>
                                 </td>
                                
                             </tr>

@@ -14,6 +14,8 @@ class UpdateTablePerfil extends Migration
     {
         Schema::table('interes', function (Blueprint $table) {
            $table->float('prediccion');
+           $table->float('satisfaccion');
+           $table->float('error');
         });
     }
 
@@ -26,6 +28,8 @@ class UpdateTablePerfil extends Migration
     {
         Schema::table('interes', function (Blueprint $table) {
             $table->dropColumn('prediccion');
+            $table->dropColumn('satisfaccion');
+            $table->dropColumn('error');
         });
     }
 }
