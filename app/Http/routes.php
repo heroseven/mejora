@@ -55,7 +55,7 @@ function elacticSearch($factor1){
    $now=date("Y-m-d H:i:s");
       
    $params = [
-       'index' => 'mejora11',
+       'index' => 'mejora12',
        'type'  => 'documento',
        'body' => [
            
@@ -116,7 +116,7 @@ Route::get('proceso',function (){
 Route::get('elasticsearch',function (){
    $client = ClientBuilder::create()->build();
       $params = [
-          'index' => 'mejora11'
+          'index' => 'mejora12'
       ];
       $response = $client->indices()->create($params);
       return Documento::addAllToIndex();
@@ -148,7 +148,7 @@ Route::get('vector_caracteristico2',function (){
        foreach ($documentos as $documento) {
           Preferencias::create(array('identificacion'=>$documento->id));
        }
-        $factores=['marketing','calidad','exportaciones','formalización','atención al cliente'];
+        $factores=['Agropecuario','Manufactura','Pesca', 'Minero','Construcción', 'Transporte','Financiero', 'Servicios empresariales','Enseñanza', 'Servicios','Salud','Financiacion', 'Marketing', 'Tecnología para mejora de procesos', 'Calidad', 'Exportaciones', 'Formalización', 'Atención al cliente'];
         foreach ($factores as $idFactor =>$factor) {
            
            $articulos_relevantes=elacticSearch($factor);
@@ -161,25 +161,79 @@ Route::get('vector_caracteristico2',function (){
                      
                          if($factor==$factores[0]){
                                 
-                                $guardar->factor1=1;
+                                $guardar->f1=1;
                                 $guardar->save();
                             }elseif($factor==$factores[1]){
                                  
-                                $guardar->factor2=1;
+                                $guardar->f2=1;
                                 $guardar->save();
                             }elseif($factor==$factores[2]){
                                  
-                                $guardar->factor3=1;
+                                $guardar->f3=1;
                                 $guardar->save();
                             }elseif($factor==$factores[3]){
                                  
-                                $guardar->factor4=1;
+                                $guardar->f4=1;
                                 $guardar->save();
                             }elseif($factor==$factores[4]){
                                  
-                                $guardar->factor5=1;
+                                $guardar->f5=1;
+                                $guardar->save();
+                            }elseif($factor==$factores[5]){
+                                 
+                                $guardar->f6=1;
+                                $guardar->save();
+                            }elseif($factor==$factores[6]){
+                                 
+                                $guardar->f7=1;
+                                $guardar->save();
+                            }elseif($factor==$factores[7]){
+                                 
+                                $guardar->f8=1;
+                                $guardar->save();
+                            }elseif($factor==$factores[8]){
+                                 
+                                $guardar->f9=1;
+                                $guardar->save();
+                            }elseif($factor==$factores[9]){
+                                 
+                                $guardar->f10=1;
+                                $guardar->save();
+                            }elseif($factor==$factores[10]){
+                                 
+                                $guardar->f11=1;
+                                $guardar->save();
+                            }elseif($factor==$factores[11]){
+                                 
+                                $guardar->f12=1;
+                                $guardar->save();
+                            }elseif($factor==$factores[12]){
+                                 
+                                $guardar->f13=1;
+                                $guardar->save();
+                            }elseif($factor==$factores[13]){
+                                 
+                                $guardar->f14=1;
+                                $guardar->save();
+                            }elseif($factor==$factores[14]){
+                                 
+                                $guardar->f15=1;
+                                $guardar->save();
+                            }elseif($factor==$factores[15]){
+                                 
+                                $guardar->f16=1;
+                                $guardar->save();
+                            }elseif($factor==$factores[16]){
+                                 
+                                $guardar->f17=1;
+                                $guardar->save();
+                            }elseif($factor==$factores[17]){
+                                 
+                                $guardar->f18=1;
                                 $guardar->save();
                             }
+                            
+                            
                   }
                            
                 
@@ -195,7 +249,7 @@ Route::get('vector_caracteristico2',function (){
       //se calcula la suma de fila
    $total_atributos=0;
    
-   $documentos=Preferencias::select('factor1','factor2','factor3','factor4','factor5','factor6','identificacion')->get();
+   $documentos=Preferencias::select('f1','f2','f3','f4','f5','f6','f7','f8','f9','f10','f11','f12','f13','f14','f15','f16','f17','f18','identificacion')->get();
    foreach ( $documentos as $documento) {
          $total_atributos=0;
          // return $documento;
@@ -205,26 +259,50 @@ Route::get('vector_caracteristico2',function (){
          // return $id;
         
          // columnas de un articulo
-         
+               if($documento->f1==1){
+                     $total_atributos=$total_atributos+1;
+               }
+                if($documento->f2==1){
+                     $total_atributos=$total_atributos+1;
+               }
+                if($documento->f3==1){
+                     $total_atributos=$total_atributos+1;
+               }
+                if($documento->f4==1){
+                     $total_atributos=$total_atributos+1;
+               }
+                if($documento->f5==1){
+                     $total_atributos=$total_atributos+1;
+               }
+                if($documento->f6==1){
+                     $total_atributos=$total_atributos+1;
+               }
+               if($documento->f7==1){
+                     $total_atributos=$total_atributos+1;
+               }if($documento->f8==1){
+                     $total_atributos=$total_atributos+1;
+               }if($documento->f9==1){
+                     $total_atributos=$total_atributos+1;
+               }if($documento->f10==1){
+                     $total_atributos=$total_atributos+1;
+               }if($documento->f11==1){
+                     $total_atributos=$total_atributos+1;
+               }if($documento->f12==1){
+                     $total_atributos=$total_atributos+1;
+               }if($documento->f13==1){
+                     $total_atributos=$total_atributos+1;
+               }if($documento->f14==1){
+                     $total_atributos=$total_atributos+1;
+               }if($documento->f15==1){
+                     $total_atributos=$total_atributos+1;
+               }if($documento->f16==1){
+                     $total_atributos=$total_atributos+1;
+               }if($documento->f17==1){
+                     $total_atributos=$total_atributos+1;
+               }if($documento->f18==1){
+                     $total_atributos=$total_atributos+1;
+               }
                
-               if($documento->factor1==1){
-                     $total_atributos=$total_atributos+1;
-               }
-                if($documento->factor2==1){
-                     $total_atributos=$total_atributos+1;
-               }
-                if($documento->factor3==1){
-                     $total_atributos=$total_atributos+1;
-               }
-                if($documento->factor4==1){
-                     $total_atributos=$total_atributos+1;
-               }
-                if($documento->factor5==1){
-                     $total_atributos=$total_atributos+1;
-               }
-                if($documento->factor6==1){
-                     $total_atributos=$total_atributos+1;
-               }
                $articulo->total_atributos=$total_atributos;
                $articulo->save();
                
@@ -239,42 +317,100 @@ Route::get('vector_caracteristico2',function (){
       $articulo=Preferencias::where('identificacion',$documento->identificacion)->first();
       
        if( $articulo->total_atributos!=0){
-           $articulo->factor1=$articulo->factor1/ sqrt($articulo->total_atributos);
+           $articulo->f1=$articulo->f1/ sqrt($articulo->total_atributos);
        }else{
-           $articulo->factor1=0;
+           $articulo->f1=0;
        }
       
       if( $articulo->total_atributos!=0){
-           $articulo->factor2=$articulo->factor2/ sqrt($articulo->total_atributos);
+           $articulo->f2=$articulo->f2/ sqrt($articulo->total_atributos);
        }else{
-           $articulo->factor2=0;
+           $articulo->f2=0;
        }
          
       if( $articulo->total_atributos!=0){
-           $articulo->factor3=$articulo->factor3/ sqrt($articulo->total_atributos);
+           $articulo->f3=$articulo->f3/ sqrt($articulo->total_atributos);
        }else{
-           $articulo->factor3=0;
+           $articulo->f3=0;
        }
        
       if( $articulo->total_atributos!=0){
-           $articulo->factor4=$articulo->factor4/ sqrt($articulo->total_atributos);
+           $articulo->f4=$articulo->f4/ sqrt($articulo->total_atributos);
        }else{
-           $articulo->factor4=0;
+           $articulo->f4=0;
        }
        
       if( $articulo->total_atributos!=0){
-           $articulo->factor5=$articulo->factor5/ sqrt($articulo->total_atributos);
+           $articulo->f5=$articulo->f5/ sqrt($articulo->total_atributos);
        }else{
-           $articulo->factor5=0;
+           $articulo->f5=0;
        }
       
       if( $articulo->total_atributos!=0){
-           $articulo->factor6=$articulo->factor6/ sqrt($articulo->total_atributos);
+           $articulo->f6=$articulo->f6/ sqrt($articulo->total_atributos);
        }else{
-           $articulo->factor6=0;
+           $articulo->f6=0;
        }
-
-      
+       if( $articulo->total_atributos!=0){
+           $articulo->f7=$articulo->f7/ sqrt($articulo->total_atributos);
+       }else{
+           $articulo->f7=0;
+       }
+       if( $articulo->total_atributos!=0){
+           $articulo->f8=$articulo->f8/ sqrt($articulo->total_atributos);
+       }else{
+           $articulo->f8=0;
+       }
+       if( $articulo->total_atributos!=0){
+           $articulo->f9=$articulo->f9/ sqrt($articulo->total_atributos);
+       }else{
+           $articulo->f9=0;
+       }
+       if( $articulo->total_atributos!=0){
+           $articulo->f10=$articulo->f10/ sqrt($articulo->total_atributos);
+       }else{
+           $articulo->f10=0;
+       }
+       if( $articulo->total_atributos!=0){
+           $articulo->f11=$articulo->f11/ sqrt($articulo->total_atributos);
+       }else{
+           $articulo->f11=0;
+       }
+       if( $articulo->total_atributos!=0){
+           $articulo->f12=$articulo->f12/ sqrt($articulo->total_atributos);
+       }else{
+           $articulo->f12=0;
+       }
+       if( $articulo->total_atributos!=0){
+           $articulo->f13=$articulo->f13/ sqrt($articulo->total_atributos);
+       }else{
+           $articulo->f13=0;
+       }
+       if( $articulo->total_atributos!=0){
+           $articulo->f14=$articulo->f14/ sqrt($articulo->total_atributos);
+       }else{
+           $articulo->f14=0;
+       }
+       if( $articulo->total_atributos!=0){
+           $articulo->f15=$articulo->f15/ sqrt($articulo->total_atributos);
+       }else{
+           $articulo->f15=0;
+       }
+       if( $articulo->total_atributos!=0){
+           $articulo->f16=$articulo->f16/ sqrt($articulo->total_atributos);
+       }else{
+           $articulo->f16=0;
+       }
+       if( $articulo->total_atributos!=0){
+           $articulo->f17=$articulo->f17/ sqrt($articulo->total_atributos);
+       }else{
+           $articulo->f17=0;
+       }
+       if( $articulo->total_atributos!=0){
+           $articulo->f18=$articulo->f18/ sqrt($articulo->total_atributos);
+       }else{
+           $articulo->f18=0;
+       }
       $articulo->save();
    }
       
@@ -284,7 +420,7 @@ Route::get('vector_caracteristico2',function (){
       // es necesario crear tantas filas interes con el campo prediccion como articulos haya para obtener predicciones de articulos no puntuados 
       // que se asemejen al vector prototipo
       
-      
+      echo 'ya termino elastic search';
       //la cración de los registros demora demaciado, mejor crear la columna user1,user2, por demanda con sql directo
       
       $articulos=Preferencias::all();
@@ -364,9 +500,9 @@ Route::group(['middleware' => ['web']], function () {
      
       $artificio='';
       foreach ($intereses as $interes) {
-         $artificio=$artificio.','."'".$interes."'";
+         $artificio=$artificio.','.$interes;
       }
-      Session::put('factores',"'".$rubro."'".$artificio);
+      Session::put('factores',$rubro.$artificio);
       $id=$request->input('id');
    return redirect('usuario/'.$id);
    
@@ -385,24 +521,51 @@ Route::group(['middleware' => ['web']], function () {
          
          //
          $factores=Session::get('factores');
-
+         // return $factores.",'".'identificacion'."'";
          $id_usuario=$usuario;
-         $articulos=Preferencias::select('factor1','factor2','factor3','factor4','factor5','factor6','identificacion')->get();
+         // return $factores;
+          $articulos=Preferencias::select('f1','f2','f3','f4','f5','f6','f7','f8','f9','f10','f11','f12','f13','f14','f15','f16','f17','f18','identificacion')->get();
+//          // $articulos=Preferencias::select($factores.",'".'identificacion'."'")->get();
+// return $articulos;
          $sum_factor1=0;
          $sum_factor2=0;
          $sum_factor3=0;
          $sum_factor4=0;
          $sum_factor5=0;
          $sum_factor6=0;
+         $sum_factor7=0;
+         $sum_factor8=0;
+         $sum_factor9=0;
+         $sum_factor10=0;
+         $sum_factor11=0;
+         $sum_factor12=0;
+         $sum_factor13=0;
+         $sum_factor14=0;
+         $sum_factor15=0;
+         $sum_factor16=0;
+         $sum_factor17=0;
+         $sum_factor18=0;
          //calculando suma de columna para cada factor
          foreach ($articulos as $articulo) {
             // return $articulo;
-            $factor1=$articulo->factor1;
-            $factor2=$articulo->factor2;
-            $factor3=$articulo->factor3;
-            $factor4=$articulo->factor4;
-            $factor5=$articulo->factor5;
-            $factor6=$articulo->factor6;
+            $factor1=$articulo->f1;
+            $factor2=$articulo->f2;
+            $factor3=$articulo->f3;
+            $factor4=$articulo->f4;
+            $factor5=$articulo->f5;
+            $factor6=$articulo->f6;
+            $factor7=$articulo->f7;
+            $factor8=$articulo->f8;
+            $factor9=$articulo->f9;
+            $factor10=$articulo->f10;
+            $factor11=$articulo->f11;
+            $factor12=$articulo->f12;
+            $factor13=$articulo->f13;
+            $factor14=$articulo->f14;
+            $factor15=$articulo->f15;
+            $factor16=$articulo->f16;
+            $factor17=$articulo->f17;
+            $factor18=$articulo->f18;
             
             $interes=Interes::where('id_articulo',$articulo->identificacion)->where('id_usuario',$id_usuario)->first();
             
@@ -430,6 +593,43 @@ Route::group(['middleware' => ['web']], function () {
                    $puntuacion=$factor6*$interes->interes;
                    $sum_factor6=$sum_factor6+$puntuacion;
                    
+                   $puntuacion=$factor6*$interes->interes;
+                   $sum_factor7=$sum_factor7+$puntuacion;
+                   
+                   $puntuacion=$factor8*$interes->interes;
+                   $sum_factor8=$sum_factor8+$puntuacion;
+                   
+                   $puntuacion=$factor9*$interes->interes;
+                   $sum_factor9=$sum_factor9+$puntuacion;
+                   
+                   $puntuacion=$factor10*$interes->interes;
+                   $sum_factor10=$sum_factor10+$puntuacion;
+                   
+                   $puntuacion=$factor11*$interes->interes;
+                   $sum_factor11=$sum_factor11+$puntuacion;
+                   
+                   $puntuacion=$factor12*$interes->interes;
+                   $sum_factor12=$sum_factor12+$puntuacion;
+                   
+                   $puntuacion=$factor13*$interes->interes;
+                   $sum_factor13=$sum_factor13+$puntuacion;
+                   
+                   $puntuacion=$factor14*$interes->interes;
+                   $sum_factor14=$sum_factor14+$puntuacion;
+                   
+                   $puntuacion=$factor15*$interes->interes;
+                   $sum_factor15=$sum_factor15+$puntuacion;
+                   
+                   $puntuacion=$factor16*$interes->interes;
+                   $sum_factor16=$sum_factor16+$puntuacion;
+                   
+                   $puntuacion=$factor17*$interes->interes;
+                   $sum_factor17=$sum_factor17+$puntuacion;
+                   
+                   $puntuacion=$factor18*$interes->interes;
+                   $sum_factor18=$sum_factor18+$puntuacion;
+                  
+                   
                }
             }
          }
@@ -438,23 +638,49 @@ Route::group(['middleware' => ['web']], function () {
          $perfil=Perfil::where('id_usuario',$id_usuario)->first();
           
           if($perfil!=null){
-             $perfil->factor1=$sum_factor1;
-             $perfil->factor2=$sum_factor2;
-             $perfil->factor3=$sum_factor3;
-             $perfil->factor4=$sum_factor4;
-             $perfil->factor5=$sum_factor5;
-             $perfil->factor6=$sum_factor6;
+             $perfil->f1=$sum_factor1;
+             $perfil->f2=$sum_factor2;
+             $perfil->f3=$sum_factor3;
+             $perfil->f4=$sum_factor4;
+             $perfil->f5=$sum_factor5;
+             $perfil->f6=$sum_factor6;
+             $perfil->f7=$sum_factor7;
+             $perfil->f8=$sum_factor8;
+             $perfil->f9=$sum_factor9;
+             $perfil->f10=$sum_factor10;
+             $perfil->f11=$sum_factor11;
+             $perfil->f12=$sum_factor12;
+             $perfil->f13=$sum_factor13;
+             $perfil->f14=$sum_factor14;
+             $perfil->f15=$sum_factor15;
+             $perfil->f16=$sum_factor16;
+             $perfil->f17=$sum_factor17;
+             $perfil->f18=$sum_factor18;
+         
              $perfil->id_usuario=$id_usuario;
              $perfil->save();
           }else{
              Perfil::create(
                 array('id_usuario'=>$id_usuario, 
-                     'factor1'=>$sum_factor1, 
-                     'factor2'=>$sum_factor2,
-                     'factor3'=>$sum_factor3, 
-                     'factor4'=>$sum_factor4, 
-                     'factor5'=>$sum_factor5, 
-                     'factor6'=>$sum_factor6));
+                     'f1'=>$sum_factor1, 
+                     'f2'=>$sum_factor2,
+                     'f3'=>$sum_factor3, 
+                     'f4'=>$sum_factor4, 
+                     'f5'=>$sum_factor5, 
+                     'f6'=>$sum_factor6,
+                     'f7'=>$sum_factor7,
+                     'f8'=>$sum_factor8,
+                     'f9'=>$sum_factor9,
+                     'f10'=>$sum_factor10,
+                     'f11'=>$sum_factor11,
+                     'f12'=>$sum_factor12,
+                     'f13'=>$sum_factor13,
+                     'f14'=>$sum_factor14,
+                     'f15'=>$sum_factor15,
+                     'f16'=>$sum_factor16,
+                     'f17'=>$sum_factor17,
+                     'f18'=>$sum_factor18,
+                     ));
           }   
                
       
@@ -463,34 +689,83 @@ Route::group(['middleware' => ['web']], function () {
            //contar valores en una columan mayores a 0
 
          $total_articulos= count(Documento::all());
-         $articulos=Preferencias::select('factor1','factor2','factor3','factor4','factor5','factor6','identificacion')->get();
+         
+         
+         $articulos= Preferencias::select('f1','f2','f3','f4','f5','f6','f7','f8','f9','f10','f11','f12','f13','f14','f15','f16','f17','f18','identificacion')->get();
          $sum_factor1=0;
          $sum_factor2=0;
          $sum_factor3=0;
          $sum_factor4=0;
          $sum_factor5=0;
          $sum_factor6=0;
+         $sum_factor7=0;
+         $sum_factor8=0;
+         $sum_factor9=0;
+         $sum_factor10=0;
+         $sum_factor11=0;
+         $sum_factor12=0;
+         $sum_factor13=0;
+         $sum_factor14=0;
+         $sum_factor15=0;
+         $sum_factor16=0;
+         $sum_factor17=0;
+         $sum_factor18=0;
          foreach ($articulos as $articulo) {
             
-            if($articulo->factor1>0){
+            if($articulo->f1>0){
                $sum_factor1+= 1;
             }
-            if($articulo->factor2>0){
+            if($articulo->f2>0){
                $sum_factor2+= 1;
             }
-            if($articulo->factor3>0){
+            if($articulo->f3>0){
                $sum_factor3+= 1;
             }
-            if($articulo->facto4>0){
+            if($articulo->f4>0){
                $sum_factor4+= 1;
             }
-            if($articulo->factor5>0){
+            if($articulo->f5>0){
                $sum_factor5+= 1;
             }
-            if($articulo->factor6>0){
+            if($articulo->f6>0){
                $sum_factor6+= 1;
             }
-            
+            if($articulo->f7>0){
+               $sum_factor6+= 1;
+            }
+            if($articulo->f8>0){
+               $sum_factor6+= 1;
+            }
+            if($articulo->f9>0){
+               $sum_factor6+= 1;
+            }
+            if($articulo->f10>0){
+               $sum_factor6+= 1;
+            }
+            if($articulo->f11>0){
+               $sum_factor6+= 1;
+            }
+            if($articulo->f12>0){
+               $sum_factor6+= 1;
+            }
+            if($articulo->f13>0){
+               $sum_factor6+= 1;
+            }
+            if($articulo->f14>0){
+               $sum_factor6+= 1;
+            }
+            if($articulo->f15>0){
+               $sum_factor6+= 1;
+            }
+            if($articulo->f16>0){
+               $sum_factor6+= 1;
+            }
+            if($articulo->f17>0){
+               $sum_factor6+= 1;
+            }
+            if($articulo->f18>0){
+               $sum_factor6+= 1;
+            }
           
          }
             //aplicar la normalización de datos
@@ -501,12 +776,44 @@ Route::group(['middleware' => ['web']], function () {
             $sum_factor4= ($sum_factor4>0)? log10($total_articulos/$sum_factor4) :0;
             $sum_factor5= ($sum_factor5>0)? log10($total_articulos/$sum_factor5) :0;
             $sum_factor6= ($sum_factor6>0)? log10($total_articulos/$sum_factor6) :0;
-            
+            $sum_factor7= ($sum_factor7>0)? log10($total_articulos/$sum_factor7) :0;
+            $sum_factor8= ($sum_factor8>0)? log10($total_articulos/$sum_factor8) :0;
+            $sum_factor9= ($sum_factor9>0)? log10($total_articulos/$sum_factor9) :0;
+            $sum_factor10= ($sum_factor10>0)? log10($total_articulos/$sum_factor10) :0;
+            $sum_factor11= ($sum_factor11>0)? log10($total_articulos/$sum_factor11) :0;
+            $sum_factor12= ($sum_factor12>0)? log10($total_articulos/$sum_factor12) :0;
+            $sum_factor13= ($sum_factor13>0)? log10($total_articulos/$sum_factor13) :0;
+            $sum_factor14= ($sum_factor14>0)? log10($total_articulos/$sum_factor14) :0;
+            $sum_factor15= ($sum_factor15>0)? log10($total_articulos/$sum_factor15) :0;
+            $sum_factor16= ($sum_factor16>0)? log10($total_articulos/$sum_factor16) :0;
+            $sum_factor17= ($sum_factor17>0)? log10($total_articulos/$sum_factor17) :0;
+            $sum_factor18= ($sum_factor18>0)? log10($total_articulos/$sum_factor18) :0;
+
             //almacenar en tabla DF
             
             
             //por cada usuario habria una fila pero sería con el mismo valor.
-            $fila=Df::create(array('factor1'=>$sum_factor1,'factor2'=>$sum_factor2,'factor3'=>$sum_factor3,'factor4'=>$sum_factor4, 'factor5'=>$sum_factor5, 'factor6'=>$sum_factor6));
+            $fila=Df::create(
+               array('f1'=>$sum_factor1,
+                     'f2'=>$sum_factor2,
+                     'f3'=>$sum_factor3,
+                     'f4'=>$sum_factor4,
+                     'f5'=>$sum_factor5,
+                     'f6'=>$sum_factor6,
+                     'f7'=>$sum_factor7,
+                     'f8'=>$sum_factor8,
+                     'f9'=>$sum_factor9,
+                     'f10'=>$sum_factor10,
+                     'f11'=>$sum_factor11,
+                     'f12'=>$sum_factor12,
+                     'f13'=>$sum_factor13,
+                     'f14'=>$sum_factor14,
+                     'f15'=>$sum_factor15,
+                     'f16'=>$sum_factor16,
+                     'f17'=>$sum_factor17,
+                     'f18'=>$sum_factor18,
+                     
+                     ));
             /*  return 'ok';*/
             
             
@@ -522,17 +829,28 @@ Route::group(['middleware' => ['web']], function () {
             foreach ($articulos as $articulo) {
                
               
-               $factor1=$articulo->factor1*$perfil_usuario->factor1*$df->factor1;
-               $factor2=$articulo->factor2*$perfil_usuario->factor2*$df->factor2;
-               $factor3=$articulo->factor3*$perfil_usuario->factor3*$df->factor3;
-               $factor4=$articulo->factor4*$perfil_usuario->factor4*$df->factor4;
-               $factor5=$articulo->factor5*$perfil_usuario->factor5*$df->factor5;
-               $factor6=$articulo->factor6*$perfil_usuario->factor6*$df->factor6;
-               
+               $factor1=$articulo->f1*$perfil_usuario->f1*$df->f1;
+               $factor2=$articulo->f2*$perfil_usuario->f2*$df->f2;
+               $factor3=$articulo->f3*$perfil_usuario->f3*$df->f3;
+               $factor4=$articulo->f4*$perfil_usuario->f4*$df->f4;
+               $factor5=$articulo->f5*$perfil_usuario->f5*$df->f5;
+               $factor6=$articulo->f6*$perfil_usuario->f6*$df->f6;
+               $factor7=$articulo->f7*$perfil_usuario->f7*$df->f7;
+               $factor8=$articulo->f8*$perfil_usuario->f8*$df->f8;
+               $factor9=$articulo->f9*$perfil_usuario->f9*$df->f9;
+               $factor10=$articulo->f10*$perfil_usuario->f10*$df->f10;
+               $factor11=$articulo->f11*$perfil_usuario->f11*$df->f11;
+               $factor12=$articulo->f12*$perfil_usuario->f12*$df->f12;
+               $factor13=$articulo->f13*$perfil_usuario->f13*$df->f13;
+               $factor14=$articulo->f14*$perfil_usuario->f14*$df->f14;
+               $factor15=$articulo->f15*$perfil_usuario->f15*$df->f15;
+               $factor16=$articulo->f16*$perfil_usuario->f16*$df->f16;
+               $factor17=$articulo->f17*$perfil_usuario->f17*$df->f17;
+               $factor18=$articulo->f18*$perfil_usuario->f18*$df->f18;
                //existen tantos articulos como tablas de interes? no
                //suma de productos
                
-               $prediccion=$prediccion+$factor1+$factor2+$factor3+$factor4+$factor5+$factor6;
+               $prediccion=$prediccion+$factor1+$factor2+$factor3+$factor4+$factor5+$factor6+$factor7+$factor8+$factor9+$factor10+$factor11+$factor12+$factor13+$factor14+$factor15+$factor16+$factor17+$factor18;
                
                // if($articulo->identificacion=='94'){
                // return $prediccion;

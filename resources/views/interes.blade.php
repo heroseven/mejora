@@ -24,28 +24,28 @@
                  <form action="../../intereses" method="POST">
                   <label>Seleccione el rubro de su empresa</label>
                        <select class="form-control" name="rubro">
-                           <option value="Agropecuario">Agropecuario</option>
-                           <option value="Manufactura">Manufactura</option>
-                           <option value="Pesca">Pesca</option>
-                           <option value="Minero">Minero</option>
-                           <option value="Construcción">Construcción</option>
-                           <option value="Transporte">Transporte</option>
-                           <option value="Financiero">Financiero</option>
-                           <option value="Servicios empresariales">Servicios empresariales</option>
-                           <option value="Enseñanza">Enseñanza</option>
-                           <option value="Servicios">Servicios</option>
-                           <option value="Salud">Salud</option>
+                           <option value="f1">Agropecuario</option>
+                           <option value="f2">Manufactura</option>
+                           <option value="f3">Pesca</option>
+                           <option value="f4">Minero</option>
+                           <option value="f5">Construcción</option>
+                           <option value="f6">Transporte</option>
+                           <option value="f7">Financiero</option>
+                           <option value="f8">Servicios empresariales</option>
+                           <option value="f9">Enseñanza</option>
+                           <option value="f10">Servicios</option>
+                           <option value="f11">Salud</option>
                        </select>
                       </br> 
                       <label>Seleccione su interés en alguna temática</label></br>
                      
-                      <input type="checkbox" name="interes[1]" value="financiacion">Financiación<br>
-                      <input type="checkbox" name="interes[2]" value="marketing">Marketing<br>
-                      <input type="checkbox" name="interes[3]" value="tecnologia">Tecnología para mejora de procesos<br>
-                      <input type="checkbox" name="interes[4]" value="calidad">Calidad<br>
-                      <input type="checkbox" name="interes[5]" value="exportaciones">Exportaciones<br>
-                      <input type="checkbox" name="interes[6]" value="formalización">Formalización<br>
-                      <input type="checkbox" name="interes[7]" value="atencion al cliente">Atención al cliente<br>
+                      <input type="checkbox" name="interes[1]" value="f12">Financiación<br>
+                      <input type="checkbox" name="interes[2]" value="f13">Marketing<br>
+                      <input type="checkbox" name="interes[3]" value="f14">Tecnología para mejora de procesos<br>
+                      <input type="checkbox" name="interes[4]" value="f15">Calidad<br>
+                      <input type="checkbox" name="interes[5]" value="f16">Exportaciones<br>
+                      <input type="checkbox" name="interes[6]" value="f17">Formalización<br>
+                      <input type="checkbox" name="interes[7]" value="f18">Atención al cliente<br>
                       <input type="hidden" name="id" value="{{$id}}"/>
                       </br>
                       <input class="form-control" type="submit" value="Enviar"/>
