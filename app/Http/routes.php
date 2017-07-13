@@ -434,15 +434,6 @@ Route::get('vector_caracteristico2',function (){
  
 });
 
-//mostrar articulos 
-Route::get('/usuario/{usuario}',function ($usuario){
-   
-   $usuario=$usuario;
-   $tasks=Preferencias::where('total_atributos','>',0)->with('articulo')->orderBy('identificacion','desc')->get();
-   // return $tasks;
-   return View::make('articulos',compact('tasks','usuario'));
-
-});
 
 
 
@@ -502,13 +493,50 @@ Route::group(['middleware' => ['web']], function () {
       foreach ($intereses as $interes) {
          $artificio=$artificio.','.$interes;
       }
-      Session::put('factores',$rubro.$artificio);
+      
+      $request->session()->put('factores',$rubro.$artificio);
+      
       $id=$request->input('id');
-   return redirect('usuario/'.$id);
+      
+      return redirect('usuario/'.$id);
    
    });
    
-   //despues de calificar
+   //mostrar articulos 
+   Route::get('/usuario/{usuario}',function ($usuario,Request $request){
+      
+      
+      $factores=Session::get('factores');
+      echo $factores;
+      $factores=explode(',',$factores);
+      
+      $todos_factores = collect(['f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7', 'f8', 'f9', 'f10', 'f11', 'f12', 'f13', 'f14', 'f15', 'f16', 'f17', 'f18']);
+
+      $factores= $todos_factores->diff($factores); 
+      $suma_de_where='';
+
+      
+      $numItems = count($factores);
+      $i = 0;
+      foreach($factores as $key=>$value) {
+         if(++$i === $numItems) {
+             $suma_de_where=$suma_de_where."".$factores[$key]." ='0'";
+         }else{
+            $suma_de_where=$suma_de_where."".$factores[$key]." ='0' and ";
+         }
+      }   
+      
+      //elminar de un arreglo ciertos factores.
+      
+      //solución al problema fue whereRaw
+      $tasks= Preferencias::whereRaw('total_atributos > 0 and '.$suma_de_where)->with('articulo')->orderBy('identificacion','desc')->get();
+     
+     // return $tasks;
+      return View::make('articulos',compact('tasks','usuario'));
+   
+   });
+
+      //despues de calificar
 
       //se calcula el vector prototipo
       Route::get('perfil_usuario/{usuario}',function ($usuario){
@@ -883,6 +911,7 @@ Route::group(['middleware' => ['web']], function () {
          $tasks=Preferencias::all();
          
          $articulos=Interes::where('id_usuario',$usuario)->where('prediccion','>','0')->with('articulo')->orderBy('prediccion','desc')->get();
+        //  return $articulos;
           return View::make('recomendaciones',compact('tasks','articulos', 'usuario'));
       
       });

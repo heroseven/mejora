@@ -26,7 +26,7 @@
                     <thead>
                         <th>Identificación</th>
                         <th>Artículo</th>
-                       
+                        <th>Más información</th>
                         <th>Predicción</th>
                         <th>Satisfacción</th>
                     </thead>
@@ -45,6 +45,10 @@
                                     <!-- Task Name -->
                                     <td class="table-text">
                                          <div>{{ $articulo->articulo->titulo }}</div>
+                                     </td>
+                                     
+                                     <td class="table-text">
+                                         <div><a href="detalle/{{$usuario}}/{{ $articulo->articulo->id }}">Ver más</a> </div>
                                      </td>
                                     <!-- <td class="table-text">-->
                                     <!--     <div>{{ $articulo->articulo->descripcion }}</div>-->
