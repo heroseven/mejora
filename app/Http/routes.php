@@ -148,6 +148,8 @@ Route::get('vector_caracteristico2',function (){
        foreach ($documentos as $documento) {
           Preferencias::create(array('identificacion'=>$documento->id));
        }
+       
+       //financiero es 7 y 21
         $factores=['Agropecuario','Manufactura','Pesca', 'Minero','Construcción', 'Transporte','Financiero', 'Servicios empresariales','Enseñanza', 'Servicios','Salud','Financiacion', 'Marketing', 'Tecnología para mejora de procesos', 'Calidad', 'Exportaciones', 'Formalización', 'Atención al cliente'];
         foreach ($factores as $idFactor =>$factor) {
            
@@ -508,16 +510,16 @@ Route::group(['middleware' => ['web']], function () {
       
       
       $factores=Session::get('factores');
-      echo $factores;
+
       $factores=explode(',',$factores);
       
       $todos_factores = collect(['f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7', 'f8', 'f9', 'f10', 'f11', 'f12', 'f13', 'f14', 'f15', 'f16', 'f17', 'f18']);
 
       $factores= $todos_factores->diff($factores); 
       $suma_de_where='';
-
-      Session::put('factores',$factores);
-      
+    
+      Session::put('factores1',$factores); 
+     
       $numItems = count($factores);
       $i = 0;
       foreach($factores as $key=>$value) {
@@ -532,6 +534,7 @@ Route::group(['middleware' => ['web']], function () {
       
       //solución al problema fue whereRaw
       $tasks= Preferencias::whereRaw('total_atributos > 0 and '.$suma_de_where)->with('articulo')->orderBy('identificacion','desc')->get();
+      
       Session::put('matriz_personalizada',$tasks);
      // return $tasks;
       return View::make('articulos',compact('tasks','usuario'));
@@ -543,8 +546,8 @@ Route::group(['middleware' => ['web']], function () {
       //se calcula el vector prototipo
       Route::get('perfil_usuario/{usuario}',function ($usuario){
 
-
-
+// return 'ok';
+        $id_usuario=$usuario;
          //se obtienen los codigos de los factores de agrado
          
          //se selecciona la matriz de articulos relacionada a esos factores 
@@ -760,40 +763,40 @@ Route::group(['middleware' => ['web']], function () {
                $sum_factor6+= 1;
             }
             if($articulo->f7>0){
-               $sum_factor6+= 1;
+               $sum_factor7+= 1;
             }
             if($articulo->f8>0){
-               $sum_factor6+= 1;
+               $sum_factor8+= 1;
             }
             if($articulo->f9>0){
-               $sum_factor6+= 1;
+               $sum_factor9+= 1;
             }
             if($articulo->f10>0){
-               $sum_factor6+= 1;
+               $sum_factor10+= 1;
             }
             if($articulo->f11>0){
-               $sum_factor6+= 1;
+               $sum_factor11+= 1;
             }
             if($articulo->f12>0){
-               $sum_factor6+= 1;
+               $sum_factor12+= 1;
             }
             if($articulo->f13>0){
-               $sum_factor6+= 1;
+               $sum_factor13+= 1;
             }
             if($articulo->f14>0){
-               $sum_factor6+= 1;
+               $sum_factor14+= 1;
             }
             if($articulo->f15>0){
-               $sum_factor6+= 1;
+               $sum_factor15+= 1;
             }
             if($articulo->f16>0){
-               $sum_factor6+= 1;
+               $sum_factor16+= 1;
             }
             if($articulo->f17>0){
-               $sum_factor6+= 1;
+               $sum_factor17+= 1;
             }
             if($articulo->f18>0){
-               $sum_factor6+= 1;
+               $sum_factor18+= 1;
             }
           
          }
@@ -843,11 +846,11 @@ Route::group(['middleware' => ['web']], function () {
                      'f18'=>$sum_factor18,
                      
                      ));    
-            /*  return 'ok';*/
+
             
             
             $perfil_usuario=Perfil::where('id_usuario',$id_usuario)->first();
-            
+         
             $df=Df::orderBy('created_at','desc')->first();
            
            
@@ -857,37 +860,58 @@ Route::group(['middleware' => ['web']], function () {
            //aqui no deberiamos considerar los factores que no son importantes para el usuario.
            //ya que se estaría buscando factores no relevantes para el usuario.
            
-            $factores=Session::get('factores');
-            $numItems = count($factores);
-
+           //  $articulos= Preferencias::select('f1','f2','f3','f4','f5','f6','f7','f8','f9','f10','f11','f12','f13','f14','f15','f16','f17','f18','identificacion')->get();
+       
             
             $prediccion=0;
 
             foreach ($articulos as $articulo) {
                
               
-               $factor1=$articulo->f1*$perfil_usuario->f1*$df->f1;
-               $factor2=$articulo->f2*$perfil_usuario->f2*$df->f2;
-               $factor3=$articulo->f3*$perfil_usuario->f3*$df->f3;
-               $factor4=$articulo->f4*$perfil_usuario->f4*$df->f4;
-               $factor5=$articulo->f5*$perfil_usuario->f5*$df->f5;
-               $factor6=$articulo->f6*$perfil_usuario->f6*$df->f6;
-               $factor7=$articulo->f7*$perfil_usuario->f7*$df->f7;
-               $factor8=$articulo->f8*$perfil_usuario->f8*$df->f8;
-               $factor9=$articulo->f9*$perfil_usuario->f9*$df->f9;
-               $factor10=$articulo->f10*$perfil_usuario->f10*$df->f10;
-               $factor11=$articulo->f11*$perfil_usuario->f11*$df->f11;
-               $factor12=$articulo->f12*$perfil_usuario->f12*$df->f12;
-               $factor13=$articulo->f13*$perfil_usuario->f13*$df->f13;
-               $factor14=$articulo->f14*$perfil_usuario->f14*$df->f14;
-               $factor15=$articulo->f15*$perfil_usuario->f15*$df->f15;
-               $factor16=$articulo->f16*$perfil_usuario->f16*$df->f16;
-               $factor17=$articulo->f17*$perfil_usuario->f17*$df->f17;
-               $factor18=$articulo->f18*$perfil_usuario->f18*$df->f18;
+           
+            // if($articulo->identificacion=='153'){
+            // return $articulo;
+            //     $factores=Session::get('factores1');
+            
+            // $numItems = count($factores);
+            // $i = 0;
+            // foreach($factores as $key=>$factor_atributo) {
+            //     echo $perfil_usuario->$factor_atributo.'a';
+            //   $resultado=$articulo->$factor_atributo*$perfil_usuario->$factor_atributo*$df->$factor_atributo;
+            
+            //     $prediccion=$prediccion+$resultado;
+            // }   
+            
+                $factor1=$articulo->f1*$perfil_usuario->f1*$df->f1;
+              $factor2=$articulo->f2*$perfil_usuario->f2*$df->f2;
+              $factor3=$articulo->f3*$perfil_usuario->f3*$df->f3;
+              $factor4=$articulo->f4*$perfil_usuario->f4*$df->f4;
+              $factor5=$articulo->f5*$perfil_usuario->f5*$df->f5;
+              $factor6=$articulo->f6*$perfil_usuario->f6*$df->f6;
+              $factor7=$articulo->f7*$perfil_usuario->f7*$df->f7;
+              $factor8=$articulo->f8*$perfil_usuario->f8*$df->f8;
+              $factor9=$articulo->f9*$perfil_usuario->f9*$df->f9;
+              $factor10=$articulo->f10*$perfil_usuario->f10*$df->f10;
+              $factor11=$articulo->f11*$perfil_usuario->f11*$df->f11;
+              $factor12=$articulo->f12*$perfil_usuario->f12*$df->f12;
+              $factor13=$articulo->f13*$perfil_usuario->f13*$df->f13;
+              $factor14=$articulo->f14*$perfil_usuario->f14*$df->f14;
+              $factor15=$articulo->f15*$perfil_usuario->f15*$df->f15;
+              $factor16=$articulo->f16*$perfil_usuario->f16*$df->f16;
+              $factor17=$articulo->f17*$perfil_usuario->f17*$df->f17;
+              $factor18=$articulo->f18*$perfil_usuario->f18*$df->f18;
+            // $prediccion=$factor12;
+            // echo $factor12;
+            
+            // return 'p'.$prediccion;
+            // }
+            
                //existen tantos articulos como tablas de interes? no
                //suma de productos
                
-               $prediccion=$prediccion+$factor1+$factor2+$factor3+$factor4+$factor5+$factor6+$factor7+$factor8+$factor9+$factor10+$factor11+$factor12+$factor13+$factor14+$factor15+$factor16+$factor17+$factor18;
+              $prediccion=$prediccion+$factor1+$factor2+$factor3+$factor4+$factor5+$factor6+$factor7+$factor8+$factor9+$factor10+$factor11+$factor12+$factor13+$factor14+$factor15+$factor16+$factor17+$factor18;
+            
+            
             //   return 'ok';
                 // if($articulo->identificacion==173){
                 //     return 'io';
