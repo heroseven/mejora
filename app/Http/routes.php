@@ -152,13 +152,14 @@ Route::get('vector_caracteristico2',function (){
         foreach ($factores as $idFactor =>$factor) {
            
            $articulos_relevantes=elacticSearch($factor);
-
+            
+             //articulos relevantes para el factor en mencion
              foreach ($articulos_relevantes as $articulo) {
-
+                  //se recorren todos los articulos relevantes para el factor en mención
                   $guardar= Preferencias::where('identificacion',$articulo->id)->first();
 
                   if(isset($guardar)){
-                     
+                        // esto sirve para poder cambiar de nombre de atributo nada más.
                          if($factor==$factores[0]){
                                 
                                 $guardar->f1=1;
@@ -515,6 +516,7 @@ Route::group(['middleware' => ['web']], function () {
       $factores= $todos_factores->diff($factores); 
       $suma_de_where='';
 
+      Session::put('factores',$factores);
       
       $numItems = count($factores);
       $i = 0;
@@ -530,7 +532,7 @@ Route::group(['middleware' => ['web']], function () {
       
       //solución al problema fue whereRaw
       $tasks= Preferencias::whereRaw('total_atributos > 0 and '.$suma_de_where)->with('articulo')->orderBy('identificacion','desc')->get();
-     
+      Session::put('matriz_personalizada',$tasks);
      // return $tasks;
       return View::make('articulos',compact('tasks','usuario'));
    
@@ -547,10 +549,9 @@ Route::group(['middleware' => ['web']], function () {
          
          //se selecciona la matriz de articulos relacionada a esos factores 
          
-         //
-         $factores=Session::get('factores');
-         // return $factores.",'".'identificacion'."'";
-         $id_usuario=$usuario;
+         //usar toda los factores....
+
+
          // return $factores;
           $articulos=Preferencias::select('f1','f2','f3','f4','f5','f6','f7','f8','f9','f10','f11','f12','f13','f14','f15','f16','f17','f18','identificacion')->get();
 //          // $articulos=Preferencias::select($factores.",'".'identificacion'."'")->get();
@@ -715,7 +716,7 @@ Route::group(['middleware' => ['web']], function () {
            //calculando el vector de DF 
            
            //contar valores en una columan mayores a 0
-
+            // solamente esta se vería afectada por l
          $total_articulos= count(Documento::all());
          
          
@@ -841,7 +842,7 @@ Route::group(['middleware' => ['web']], function () {
                      'f17'=>$sum_factor17,
                      'f18'=>$sum_factor18,
                      
-                     ));
+                     ));    
             /*  return 'ok';*/
             
             
@@ -852,6 +853,14 @@ Route::group(['middleware' => ['web']], function () {
            
            
            //calculando predicción por la suma de productos de v caracteristico, perfil y DF
+           
+           //aqui no deberiamos considerar los factores que no son importantes para el usuario.
+           //ya que se estaría buscando factores no relevantes para el usuario.
+           
+            $factores=Session::get('factores');
+            $numItems = count($factores);
+
+            
             $prediccion=0;
 
             foreach ($articulos as $articulo) {
@@ -879,13 +888,16 @@ Route::group(['middleware' => ['web']], function () {
                //suma de productos
                
                $prediccion=$prediccion+$factor1+$factor2+$factor3+$factor4+$factor5+$factor6+$factor7+$factor8+$factor9+$factor10+$factor11+$factor12+$factor13+$factor14+$factor15+$factor16+$factor17+$factor18;
+            //   return 'ok';
+                // if($articulo->identificacion==173){
+                //     return 'io';
+                //  return $articulo->f12;  
+                    // return $perfil_usuario->f12;
+                    // return $prediccion;
+                // }
                
-               // if($articulo->identificacion=='94'){
-               // return $prediccion;
-               // }
-               
-               // return $prediccion;
               
+            //   echo $articulo->identificacion.', ';
                
                //esta botando nulo en articulos que no encuentra.
                $guardar_prediccion=Interes::where('id_usuario',$id_usuario)->where('id_articulo',$articulo->identificacion)->first();
@@ -911,7 +923,7 @@ Route::group(['middleware' => ['web']], function () {
          $tasks=Preferencias::all();
          
          $articulos=Interes::where('id_usuario',$usuario)->where('prediccion','>','0')->with('articulo')->orderBy('prediccion','desc')->get();
-        //  return $articulos;
+        //return $articulos;
           return View::make('recomendaciones',compact('tasks','articulos', 'usuario'));
       
       });
